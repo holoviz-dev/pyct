@@ -3,13 +3,22 @@ Tasks for conda world
 
 """
 
+# TODO: move tasks to conda.py and leave hacks here.
+
 import platform
 import sys
 import os
+import json
 try:
     from urllib.request import urlretrieve
 except ImportError:
     from urllib import urlretrieve
+
+#try:
+#    import conda
+#except ImportError:
+#    conda = None
+from conda.cli.python_api import Commands, run_command
 
 try:
     import yaml
@@ -23,6 +32,19 @@ from .util import _options_param, test_python, test_group, test_requires, get_to
 
 
 ########## UTIL/CONFIG ##########
+
+## TODO: rename, plus link to hack about parameter sharing :(
+name = {
+    'name':'name',
+    'long':'name',
+    'type':str,
+    'default':'test-environment'}
+env_name = {
+    'name':'env_name',
+    'long':'env-name',
+    'type':str,
+    'default':'test-environment'}
+##
 
 _channel_param = {
     'name':'channel',
@@ -50,7 +72,7 @@ python_develop = "pip install --no-deps -e ."
 # travis? Translate from setup.py?  Read from meta.yaml? Install from
 # existing anaconda.org conda package and then remove --force?  Build
 # and install conda package then remove --force?
-def get_dependencies(groups):
+def _get_dependencies(groups):
     """get dependencies from setup.py"""
     try:
         from setup import meta
@@ -66,8 +88,10 @@ def get_dependencies(groups):
             deps += meta.get(group,[])
         else:
             deps += meta.get('extras_require',{}).get(group,[])
+    return deps
 
-    return " ".join('"%s"'%dep for dep in deps)
+def get_dependencies(groups):
+    return " ".join('"%s"'%dep for dep in _get_dependencies(groups))
 
 
 
@@ -89,6 +113,62 @@ def _conda_install_with_options(options,channel):
 def task_env_capture():
     """Report all information required to recreate current conda environment"""
     return {'actions':["conda info","conda list","conda env export"]}
+
+def task_env_export():
+    """
+    Generate a pinned environment.yaml from specified env, filtering
+    against specified groups of deps.
+
+    If env does not exist, will be created first.
+
+    Pretty awkward right now! Have to run something like this...
+
+    doit ecosystem=conda env_export --env-name [ENV_NAME] --env-file [SOME_FILE.yaml] env_create --name [ENV_NAME]
+
+    e.g.
+
+    doit ecosystem=conda env_export --env-name t123 --env-file test123.yaml --options examples --options tests env_create --name t123
+    """
+
+    # TODO: required, rename, friendlier
+    env_file = {
+        'name':'env_file',
+        'long':'env-file',
+        'type':str,
+        'default':''}
+
+    def x(env_name,options,env_file):
+        import collections
+        from conda_env.env import from_environment, Environment
+        env_names = [(os.path.basename(e),e) for e in json.loads(run_command(Commands.INFO,"--json")[0])['envs']]
+        counts = collections.Counter([x[0] for x in env_names])
+        assert counts[env_name]==1 # would need more than name to be sure...
+        prefix = dict(env_names)[env_name]
+        E = from_environment(env_name, prefix, no_builds=True, ignore_channels=False)
+        from conda.models.match_spec import MatchSpec
+
+        deps = set([MatchSpec(d).name for d in _get_dependencies(['install_requires']+options)])
+
+        for what in E.dependencies: # conda, pip, ... (good luck)
+            E.dependencies[what] = [d for d in E.dependencies[what] if MatchSpec(d).name in deps]
+        # what could go wrong?
+        E.dependencies.raw = []
+        if len(E.dependencies.get('conda',[]))>0:
+            E.dependencies.raw += E.dependencies['conda']
+        if len(E.dependencies.get('pip',[]))>0:
+            E.dependencies.raw += [{'pip':E.dependencies['pip']}]
+
+        # TODO: add python_requires to conda typdeps
+
+        E.prefix = None
+        # TODO: win/unicode
+        with open(env_file,'w') as f:
+            f.write(E.to_yaml())
+
+    return {'actions':[x],
+            # TODO: missing env update...install options into named env!
+            'task_dep': ['env_create'],
+            'params': [env_name, _options_param, env_file]}
 
 
 miniconda_url = {
@@ -149,7 +229,7 @@ def task_ecosystem_setup():
 
     def thing2(channel):
         return "conda install -y %s anaconda-client conda-build"%" ".join(['-c %s'%c for c in channel])
-    
+
     return {
         'actions': [CmdAction(thing1), CmdAction(thing2)],
         'params': [_channel_param]}
@@ -184,9 +264,9 @@ def task_package_build():
     """
     # TODO: conda.recipe path hardcoded/repeated
 
-    # hacks to get a quick version of 
+    # hacks to get a quick version of
     # https://github.com/conda/conda-build/issues/2648
-    
+
     def thing(channel):
         return "conda build %s conda.recipe/%s"%(" ".join(['-c %s'%c for c in channel]),
                                                  "%(recipe)s")
@@ -200,7 +280,7 @@ def task_package_build():
                     )
         # hack again for returning variable number of commands...
         return " && ".join(cmds)
-    
+
     def create_recipe_append(recipe,test_python,test_group,test_requires,pkg_tests):
         if not pkg_tests:
             return
@@ -213,7 +293,7 @@ def task_package_build():
             deps = get_tox_deps(environment)
             cmds = get_tox_cmds(environment)
             py = get_tox_python(environment)
-  
+
             # deps and cmds are appended
             #
             # TODO: will overwrite recipe_append--... if someone
@@ -260,7 +340,7 @@ def task_package_upload():
     """Upload package built from conda.recipe/ (or specified alternative)."""
     # TODO: need to upload only if package doesn't exist (as
     # e.g. there are cron builds)
-    
+
     def thing(label):
         # TODO: fix backticks hack/windows
         return 'anaconda --token %(token)s upload --user pyviz ' + ' '.join(['--label %s'%l for l in label]) + ' `conda build --output conda.recipe/%(recipe)s`'
@@ -300,7 +380,6 @@ def task_package_upload():
 # TODO: not sure this task buys much (but allows to call create_env
 # even if env already exists, for updating).
 
-# TODO: should be called create_env or similar
 def task_env_create():
     """Create named environment if it doesn't already exist"""
     python = {
@@ -309,23 +388,12 @@ def task_env_create():
         'type':str,
         'default':'3.6'}
 
-    name = {
-        'name':'name',
-        'long':'name',
-        'type':str,
-        'default':'test-environment'}
-
     return {
         'params': [python,name],
-        # TODO: this assumes env created in default location...but
-        # apparently any conda has access to any other conda's
-        # environments (?!) plus those in ~/.conda/envs (?!)
-        # TODO: consider using conda's api? https://github.com/conda/conda/issues/7059
-        'uptodate': [lambda task,values: os.path.exists(os.path.join(sys.prefix,"envs",task.options['name']))],
+        # conda's api https://github.com/conda/conda/issues/7059
+        'uptodate': [lambda task,values: task.options['name'] in [os.path.basename(e) for e in json.loads(run_command(Commands.INFO,"--json")[0])['envs']]],
         # TODO: should add doit here
         'actions': ["conda create -y --name %(name)s python=%(python)s"]}
-
-
 
 # TODO: doit - how to share parameters with dependencies? Lots of
 # awkwardness here to work around that...
@@ -345,7 +413,7 @@ def task_develop_install():
     Pass --options multiple times to specify other optional groups
     (see project's setup.py for available options).
 
-    E.g. 
+    E.g.
 
     ``doit develop_install -o examples -o tests``
     ``doit develop_install -o all``
@@ -355,4 +423,3 @@ def task_develop_install():
         CmdAction(_conda_install_with_options),
         python_develop],
             'params': [_options_param,_channel_param]}
-
