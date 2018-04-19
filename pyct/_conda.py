@@ -402,7 +402,7 @@ def task_env_create():
     try:
         from conda.cli.python_api import Commands, run_command
     except:
-        pass
+        Commands = run_command = None
     
     return {
         'params': [python,name],
