@@ -107,6 +107,9 @@ def _conda_install_with_options(options,channel,env_name_again):
         return echo("Skipping conda install (no dependencies)")
 
 
+# TODO: another parameter workaround
+def _conda_install_with_options_hacked(options,channel):
+    return _conda_install_with_options(options,channel,''):
 
 ############################################################
 # TASKS...
@@ -437,6 +440,6 @@ def task_develop_install():
 
     """
     return {'actions': [
-        CmdAction(_conda_install_with_options),
+        CmdAction(_conda_install_with_options_hacked),
         python_develop],
             'params': [_options_param,_channel_param]}
