@@ -109,7 +109,7 @@ def _conda_install_with_options(options,channel,env_name_again):
 
 # TODO: another parameter workaround
 def _conda_install_with_options_hacked(options,channel):
-    return _conda_install_with_options(options,channel,''):
+    return _conda_install_with_options(options,channel,'')
 
 ############################################################
 # TASKS...
