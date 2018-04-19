@@ -13,11 +13,10 @@ try:
 except ImportError:
     from urllib import urlretrieve
 
-#try:
-#    import conda
-#except ImportError:
-#    conda = None
-from conda.cli.python_api import Commands, run_command
+
+# TODO: Some conda stuff not imported until later because this file
+# should be importable even without conda.  Will deal with that in the
+# future.
 
 try:
     import yaml
@@ -145,6 +144,7 @@ def task_env_export():
     def x(env_name,options,env_file):
         import collections
         from conda_env.env import from_environment
+        from conda.cli.python_api import Commands, run_command
         env_names = [(os.path.basename(e),e) for e in json.loads(run_command(Commands.INFO,"--json")[0])['envs']]
         counts = collections.Counter([x[0] for x in env_names])
         assert counts[env_name]==1 # would need more than name to be sure...
@@ -398,6 +398,12 @@ def task_env_create():
         'type':str,
         'default':'3.6'}
 
+    # TODO: improve messages about missing deps
+    try:
+        from conda.cli.python_api import Commands, run_command
+    except:
+        pass
+    
     return {
         'params': [python,name],
         # conda's api https://github.com/conda/conda/issues/7059
