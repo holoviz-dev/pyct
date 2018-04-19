@@ -401,13 +401,14 @@ def task_env_create():
     # TODO: improve messages about missing deps
     try:
         from conda.cli.python_api import Commands, run_command
+        uptodate = lambda task,values: task.options['name'] in [os.path.basename(e) for e in json.loads(run_command(Commands.INFO,"--json")[0])['envs']]
     except:
-        Commands = run_command = None
+        uptodate = False
     
     return {
         'params': [python,name],
         # conda's api https://github.com/conda/conda/issues/7059
-        'uptodate': [lambda task,values: task.options['name'] in [os.path.basename(e) for e in json.loads(run_command(Commands.INFO,"--json")[0])['envs']]],
+        'uptodate': [uptodate],
         # TODO: should add doit here
         'actions': ["conda create -y --name %(name)s python=%(python)s"]}
 
