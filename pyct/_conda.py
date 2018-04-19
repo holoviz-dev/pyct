@@ -6,7 +6,6 @@ Tasks for conda world
 # TODO: move tasks to conda.py and leave hacks here.
 
 import platform
-import sys
 import os
 import json
 try:
@@ -44,6 +43,11 @@ env_name = {
     'long':'env-name',
     'type':str,
     'default':'test-environment'}
+env_name_again = {
+    'name':'env_name_again',
+    'long':'env-name-again',
+    'type':str,
+    'default':''}
 ##
 
 _channel_param = {
@@ -95,10 +99,11 @@ def get_dependencies(groups):
 
 
 
-def _conda_install_with_options(options,channel):
+def _conda_install_with_options(options,channel,env_name_again):
     deps = get_dependencies(['install_requires']+options)
     if len(deps)>0:
-        return "conda install -y %s %s"%(" ".join(['-c %s'%c for c in channel]),deps)
+        e = '' if env_name_again=='' else '-n %s'%env_name_again
+        return "conda install -y " + e + " %s %s"%(" ".join(['-c %s'%c for c in channel]),deps)
     else:
         return echo("Skipping conda install (no dependencies)")
 
@@ -123,11 +128,11 @@ def task_env_export():
 
     Pretty awkward right now! Have to run something like this...
 
-    doit ecosystem=conda env_export --env-name [ENV_NAME] --env-file [SOME_FILE.yaml] env_create --name [ENV_NAME]
+    doit ecosystem=conda env_export --env-name [ENV_NAME] --env-file [SOME_FILE.yaml] --env-name-again [ENV_NAME] env_create --name [ENV_NAME]
 
     e.g.
 
-    doit ecosystem=conda env_export --env-name t123 --env-file test123.yaml --options examples --options tests env_create --name t123
+    doit ecosystem=conda env_export --env-name _pyct_test_one --env-file pyct_test_one.yaml --env-name-again _pyct_test_one --options examples env_create --name _pyct_test_one
     """
 
     # TODO: required, rename, friendlier
@@ -139,7 +144,7 @@ def task_env_export():
 
     def x(env_name,options,env_file):
         import collections
-        from conda_env.env import from_environment, Environment
+        from conda_env.env import from_environment
         env_names = [(os.path.basename(e),e) for e in json.loads(run_command(Commands.INFO,"--json")[0])['envs']]
         counts = collections.Counter([x[0] for x in env_names])
         assert counts[env_name]==1 # would need more than name to be sure...
@@ -149,7 +154,7 @@ def task_env_export():
 
         deps = set([MatchSpec(d).name for d in _get_dependencies(['install_requires']+options)])
 
-        for what in E.dependencies: # conda, pip, ... (good luck)
+        for what in E.dependencies:
             E.dependencies[what] = [d for d in E.dependencies[what] if MatchSpec(d).name in deps]
         # what could go wrong?
         E.dependencies.raw = []
@@ -158,18 +163,23 @@ def task_env_export():
         if len(E.dependencies.get('pip',[]))>0:
             E.dependencies.raw += [{'pip':E.dependencies['pip']}]
 
-        # TODO: add python_requires to conda typdeps
-
+        # TODO: add python_requires to conda deps?
         E.prefix = None
         # TODO: win/unicode
         with open(env_file,'w') as f:
             f.write(E.to_yaml())
 
-    return {'actions':[x],
-            # TODO: missing env update...install options into named env!
+    return {'actions':[
+        CmdAction(_hacked_conda_install_with_options),
+        x],
             'task_dep': ['env_create'],
-            'params': [env_name, _options_param, env_file]}
+            'params': [env_name, _options_param, env_file, env_name_again,_options_param,_channel_param]}
 
+# because of default options value...removing 'tests'
+def _hacked_conda_install_with_options(task,options,channel,env_name_again):
+    if 'tests' in task.options.get('options',[]):
+        task.options['options'].remove('tests')
+    return _conda_install_with_options(options,channel,env_name_again)
 
 miniconda_url = {
     "Windows": "https://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe",
