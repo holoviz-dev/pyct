@@ -38,7 +38,9 @@ jobs:
   - <<: *pip_default
     stage: pip_dev_package
     env: PYPI="https://test.pypi.org/legacy/"
-    install: doit package_build --test-group=all
+    install:
+      - unset PYENV_VERSION && pyenv global 3.6 2.7
+      - doit package_build --test-group=examples --test-python=py36 --test-python=py27
     script: doit package_upload -u $TPYPIU -p $TPYPIP -r ${PYPI}
 
   - &conda_default
@@ -49,5 +51,5 @@ jobs:
       - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
       - conda config --set always_yes True
       - conda install -c pyviz/label/dev pyct && doit ecosystem_setup
-    install: doit package_build --test-python=py36 --test-python=py27 --test-group=all
+    install: doit package_build --test-python=py36 --test-python=py27 --test-group=examples
     script: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev
