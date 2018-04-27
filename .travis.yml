@@ -43,6 +43,14 @@ jobs:
       - doit package_build --test-group=examples --test-python=py36 --test-python=py27
     script: doit package_upload -u $TPYPIU -p $TPYPIP -r ${PYPI}
 
+  - <<: *pip_default
+    stage: pip_package
+    env: PYPI="https://upload.pypi.org/legacy/"
+    install:
+      - unset PYENV_VERSION && pyenv global 3.6 2.7
+      - doit package_build --test-group=examples --test-python=py36 --test-python=py27
+    script: doit package_upload -u $PYPIU -p $PYPIP -r ${PYPI}
+
   - &conda_default
     stage: conda_dev_package
     env: PYCT_ECOSYSTEM=conda
@@ -53,3 +61,14 @@ jobs:
       - conda install -c pyviz/label/dev pyct && doit ecosystem_setup
     install: doit package_build --test-python=py36 --test-python=py27 --test-group=examples
     script: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev
+
+  - &conda_default
+    stage: conda_package
+    env: PYCT_ECOSYSTEM=conda
+    before_install:
+      - pip install pyct && doit miniconda_install && pip uninstall -y doit pyct
+      - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
+      - conda config --set always_yes True
+      - conda install -c pyviz/label/dev pyct && doit ecosystem_setup
+    install: doit package_build --test-python=py36 --test-python=py27 --test-group=examples
+    script: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main
