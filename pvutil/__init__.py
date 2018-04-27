@@ -1,6 +1,6 @@
 try:
     from version import Version
-    __version__ = str(Version(fpath=__file__,archive_commit="$Format:%h$",reponame="pyct"))
+    __version__ = str(Version(fpath=__file__,archive_commit="$Format:%h$",reponame="pvutil"))
     del Version
 except:
     import os, json
