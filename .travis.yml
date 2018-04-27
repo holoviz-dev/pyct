@@ -1,0 +1,53 @@
+sudo: false
+language: generic
+
+# quick hack to determine what tag is (improvements welcomed)
+#     release: ^v(\d+|\.)*[^a-z]\d*$
+# dev release: ^v(\d+|\.)*[a-z]\d*$
+
+env:
+  global:
+    - PYENV_VERSION=3.6
+
+stages:
+  - test
+  - name: conda_dev_package
+    if: tag =~ ^v(\d+|\.)*[a-z]\d*$ OR (branch = master AND type != pull_request)
+  - name: pip_dev_package
+    if: tag =~ ^v(\d+|\.)*[a-z]\d*$
+  - name: conda_package
+    if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
+  - name: pip_package
+    if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
+
+jobs:
+  include:
+
+  ########## TEST DEVELOPER INSTALL ##########  
+
+  ## pip
+  
+  - &pip_default
+    stage: test
+    before_install: pip install pyct && doit ecosystem_setup
+    install: doit develop_install
+    script: doit test_all
+
+  ########## END-USER PACKAGES ##########
+
+  - <<: *pip_default
+    stage: pip_dev_package
+    env: PYPI="https://test.pypi.org/legacy/"
+    install: doit package_build --test-group=all
+    script: doit package_upload -u $TPYPIU -p $TPYPIP -r ${PYPI}
+
+  - &conda_default
+    stage: conda_dev_package
+    env: PYCT_ECOSYSTEM=conda
+    before_install:
+      - pip install pyct && doit miniconda_install && pip uninstall -y doit pyct
+      - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
+      - conda config --set always_yes True
+      - conda install -c pyviz/label/dev pyct && doit ecosystem_setup
+    install: doit package_build --test-python=py36 --test-python=py27 --test-group=all
+    script: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev
