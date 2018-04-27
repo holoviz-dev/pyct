@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 import version
 
@@ -8,7 +8,7 @@ setup_args = dict(
     version = version.get_setup_version('pvutil'),
     license = 'BSD-3',
     url = 'http://github.com/pyviz/pyct',
-    packages=['pvutil'],
+    packages = find_packages(),
     python_requires=">=2.7",
     include_package_data = True,
     install_requires=[
