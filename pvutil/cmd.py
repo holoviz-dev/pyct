@@ -6,7 +6,7 @@ from __future__ import print_function, absolute_import, division
 
 import importlib
 import inspect
-
+import argparse
 import distutils.dir_util
 
 def install_examples(name,path,include_data=False,verbose=False):
@@ -317,9 +317,9 @@ def download_data(name,path,datasets_filename="datasets.yml"):
 
 # the alternative is a plugin system?
 def add_pv_commands(parser,commands_to_add,name,args):
+    # use to add just specified commands (see substitute_main for alternative)
 
     # use dict/reg instead
-
     if 'install_examples' in commands_to_add:
         eg_parser = parser.add_parser('install_examples', help=inspect.getdoc(install_examples))
         eg_parser.set_defaults(func=lambda args: install_examples(name, args.path, args.include_data, args.verbose))
@@ -333,3 +333,20 @@ def add_pv_commands(parser,commands_to_add,name,args):
         d_parser.add_argument('--path',type=str,help='where to download data',default='%s-examples'%name)
         d_parser.add_argument('--datasets-filename',type=str,help='something',default='datasets.yml')
         d_parser.add_argument('-v', '--verbose', action='count', default=0)
+
+
+def substitute_main(name,cmds=None,args=None):
+    # can use if your module has no other commands
+
+    if cmds is None:
+        # again a reg
+        cmds = ['install_examples','download_data']
+    
+    mod = importlib.import_module(name)
+    parser = argparse.ArgumentParser(description="%s commands"%name)
+    parser.add_argument('--version', action='version', version='%(prog)s '+mod.__version__)
+    subparsers = parser.add_subparsers(title='available commands')
+    add_pv_commands(subparsers,cmds,name,args)
+    args = parser.parse_args()
+    args.func(args) if hasattr(args,'func') else parser.error("must supply command to run") 
+    
