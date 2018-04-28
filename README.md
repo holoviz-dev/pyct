@@ -50,6 +50,22 @@ $ ls earthsim-examples/
 conftest.py  datasets.yml  topics  user_guide  README.md
 ```
 
+Or install examples and download data:
+```
+$ rm -rf earthsim-examples/
+$ earthsim install_examples --path=earthsim-examples --include-data
+Installed examples at /tmp/earthsim-examples
+Downloading data defined in /tmp/earthsim-examples/datasets.yml to /tmp/earthsim-examples/data
+Downloading Depth data for the Chesapeake and Delaware Bay region of the USA 1 of 1
+[################################] 20444/20444 - 00:00:05
+Downloading SanDiego mesh data and AdH model output 1 of 1
+[################################] 26161/26161 - 00:00:04
+Downloading Vicksburg watershed shapefile used as GSSHA simulation input 1 of 1
+[################################] 4/4 - 00:00:00
+$ ls earthsim-examples/
+conftest.py  data  datasets.yml  topics  user_guide  README.md
+```
+
 Currently, re-running the command will 'update' any installed example
 older than the source (think will change to never overwrite instead).
 
