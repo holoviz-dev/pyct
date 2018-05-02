@@ -337,7 +337,7 @@ def add_pv_commands(parser,commands_to_add,name,args):
     # use dict/reg instead
     if 'install_examples' in commands_to_add:
         eg_parser = parser.add_parser('install_examples', help=inspect.getdoc(install_examples))
-        eg_parser.set_defaults(func=lambda args: install_examples(name, args.path, args.include_data, args.verbose))
+        eg_parser.set_defaults(func=lambda args: install_examples(name, args.path, args.include_data, args.verbose, args.force))
         eg_parser.add_argument('--path',type=str,help='where to install examples',default='%s-examples'%name)
         eg_parser.add_argument('--include-data',action='store_true',help='also download data (see download_data command for more flexibility)')
         eg_parser.add_argument('-v', '--verbose', action='count', default=0)
