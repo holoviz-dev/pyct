@@ -15,7 +15,7 @@ def install_examples(name,path,include_data=False,verbose=False):
     source = os.path.join(os.path.dirname(inspect.getfile(mod)),"examples")
     path = os.path.abspath(path)
     if os.path.exists(path):
-        print("Path %s already exists; will not overwrite newer target files."%path)
+        raise ValueError("Path %s already exists; please move it away or choose a different path."%path)
     distutils.dir_util.copy_tree(source, path, verbose=verbose)
     print("Installed examples at %s"%path)
     if include_data:

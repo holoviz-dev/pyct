@@ -66,19 +66,7 @@ $ ls earthsim-examples/
 conftest.py  data  datasets.yml  topics  user_guide  README.md
 ```
 
-Currently, re-running the command will 'update' any installed example
-older than the source (think will change to never overwrite instead).
-
-```
-$ earthsim install_examples --path=earthsim-examples --include-data
-Path /tmp/earthsim-examples already exists; will only overwrite older target files.
-Installed examples at /tmp/earthsim-examples
-Downloading data defined in /tmp/earthsim-examples/datasets.yml to /tmp/earthsim-examples/data
-Skipping Depth data for the Chesapeake and Delaware Bay region of the USA
-Skipping SanDiego mesh data and AdH model output
-Skipping Vicksburg watershed shapefile used as GSSHA simulation input
-```
-
+Note: will not overwrite existing path.
 
 Can also download data alone:
 
