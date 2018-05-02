@@ -292,17 +292,17 @@ def _process_dataset(dataset, output_dir, here):
         print('this download script requires the requests module: conda install requests')
         sys.exit(1)
 
-def download_data(name,path,datasets_filename="datasets.yml"):
-    '''Download sample datasets as defined by path/datasets_filename if it exists or module's own examples/datasets_filename otherwise
+def download_data(name,path,datasets="datasets.yml"):
+    '''Download sample datasets as defined by path/datasets if it exists or module's own examples/datasets otherwise
 
     Datasets are downloaded to path/data
     '''
     path = os.path.abspath(path)
 
-    info_file = os.path.join(path,datasets_filename)
+    info_file = os.path.join(path,datasets)
     if not os.path.exists(info_file):
         mod = importlib.import_module(name)
-        info_file = os.path.abspath(os.path.join(os.path.dirname(inspect.getfile(mod)),"examples",datasets_filename))
+        info_file = os.path.abspath(os.path.join(os.path.dirname(inspect.getfile(mod)),"examples",datasets))
 
     print("Downloading data defined in %s to %s"%(info_file,os.path.join(path,"data"))) # data is added later...
 
@@ -329,9 +329,9 @@ def add_pv_commands(parser,commands_to_add,name,args):
 
     if 'download_data' in commands_to_add:
         d_parser = parser.add_parser('download_data', help=inspect.getdoc(download_data))
-        d_parser.set_defaults(func=lambda args: download_data(name,args.path,args.datasets_filename))
+        d_parser.set_defaults(func=lambda args: download_data(name,args.path,args.datasets))
         d_parser.add_argument('--path',type=str,help='where to download data',default='%s-examples'%name)
-        d_parser.add_argument('--datasets-filename',type=str,help='something',default='datasets.yml')
+        d_parser.add_argument('--datasets',type=str,help='*name* of datasets file; must exist either in path specified by --path or in package/examples/',default='datasets.yml')
         d_parser.add_argument('-v', '--verbose', action='count', default=0)
 
 
