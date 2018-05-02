@@ -9,18 +9,33 @@ import inspect
 import argparse
 import distutils.dir_util
 
-def install_examples(name,path,include_data=False,verbose=False):
+def install_examples(name,path,include_data=False,verbose=False,force=False):
     """Install examples at the supplied path."""
-    mod = importlib.import_module(name)
-    source = os.path.join(os.path.dirname(inspect.getfile(mod)),"examples")
+    module_path = os.path.dirname(inspect.getfile(importlib.import_module(name)))
+    candidates = [
+        # installed package
+        os.path.join(module_path,"examples"),
+        # git repo
+        os.path.join(module_path,"..","examples")]
+
+    source = None
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            source = candidate
+    if source is None:
+        raise ValueError("Could not find examples for %s at any of %s"%(name,candidates))
+
     path = os.path.abspath(path)
-    if os.path.exists(path):
-        raise ValueError("Path %s already exists; please move it away or choose a different path."%path)
+    if os.path.exists(path) and not force:
+        raise ValueError("Path %s already exists; please move it away, choose a different path, or use force."%path)
+    
+    if verbose: print("Copying examples from %s"%source)
     distutils.dir_util.copy_tree(source, path, verbose=verbose)
     print("Installed examples at %s"%path)
+        
     if include_data:
         download_data(name,path)
-
+    
 
 """
 Copyright (c) 2011, Kenneth Reitz <me@kennethreitz.com>
@@ -326,6 +341,7 @@ def add_pv_commands(parser,commands_to_add,name,args):
         eg_parser.add_argument('--path',type=str,help='where to install examples',default='%s-examples'%name)
         eg_parser.add_argument('--include-data',action='store_true',help='also download data (see download_data command for more flexibility)')
         eg_parser.add_argument('-v', '--verbose', action='count', default=0)
+        eg_parser.add_argument('--force', action='store_true', help='if PATH already exists, force overwrite existing files if older than source files')
 
     if 'download_data' in commands_to_add:
         d_parser = parser.add_parser('download_data', help=inspect.getdoc(download_data))
