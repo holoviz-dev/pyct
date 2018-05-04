@@ -23,10 +23,15 @@ def _find_examples(name):
             return candidate
 
     raise ValueError("Could not find examples for %s at any of %s"%(name,candidates))
-    
 
-def install_examples(name,path,include_data=False,verbose=False,force=False):
-    """Install examples at the supplied path."""
+def examples(name,path,verbose=False,force=False):
+    """Copy examples and fetch data to the supplied path. See copy-examples and fetch-data for more flexibility."""
+    copy_examples(name, path, verbose, force)
+    fetch_data(name,path)
+
+
+def copy_examples(name,path,verbose=False,force=False):
+    """Copy examples to the supplied path."""
     source = _find_examples(name)
     path = os.path.abspath(path)
     if os.path.exists(path) and not force:
@@ -34,10 +39,7 @@ def install_examples(name,path,include_data=False,verbose=False,force=False):
     if verbose:
         print("Copying examples from %s"%source)
     distutils.dir_util.copy_tree(source, path, verbose=verbose)
-    print("Installed examples at %s"%path)
-    if include_data:
-        download_data(name,path)
-    
+    print("Copied examples to %s"%path)
 
 """
 Copyright (c) 2011, Kenneth Reitz <me@kennethreitz.com>
@@ -308,17 +310,17 @@ def _process_dataset(dataset, output_dir, here):
         print('this download script requires the requests module: conda install requests')
         sys.exit(1)
 
-def download_data(name,path,datasets="datasets.yml"):
-    '''Download sample datasets as defined by path/datasets if it exists or module's own examples/datasets otherwise
+def fetch_data(name,path,datasets="datasets.yml"):
+    '''Fetch sample datasets as defined by path/datasets if it exists or else module's own examples/datasets otherwise.
 
-    Datasets are downloaded to path/data
+    Datasets are placed in path/data
     '''
     path = os.path.abspath(path)
     info_file = os.path.join(path,datasets)
     if not os.path.exists(info_file):
         info_file = os.path.join(_find_examples(name),datasets)
 
-    print("Downloading data defined in %s to %s"%(info_file,os.path.join(path,"data"))) # data is added later...
+    print("Fetching data defined in %s and placing in %s"%(info_file,os.path.join(path,"data"))) # data is added later...
 
     with open(info_file) as f:
         info = ordered_load(f.read())
@@ -333,21 +335,29 @@ def download_data(name,path,datasets="datasets.yml"):
 def add_pv_commands(parser,commands_to_add,name,args):
     # use to add just specified commands (see substitute_main for alternative)
 
+    # TODO: should be cleaned up
+    
     # use dict/reg instead
-    if 'install_examples' in commands_to_add:
-        eg_parser = parser.add_parser('install_examples', help=inspect.getdoc(install_examples))
-        eg_parser.set_defaults(func=lambda args: install_examples(name, args.path, args.include_data, args.verbose, args.force))
-        eg_parser.add_argument('--path',type=str,help='where to install examples',default='%s-examples'%name)
-        eg_parser.add_argument('--include-data',action='store_true',help='also download data (see download_data command for more flexibility)')
+    if 'copy-examples' in commands_to_add:
+        eg_parser = parser.add_parser('copy-examples', help=inspect.getdoc(copy_examples))
+        eg_parser.set_defaults(func=lambda args: copy_examples(name, args.path, args.verbose, args.force))
+        eg_parser.add_argument('--path',type=str,help='where to copy examples',default='%s-examples'%name)
         eg_parser.add_argument('-v', '--verbose', action='count', default=0)
         eg_parser.add_argument('--force', action='store_true', help='if PATH already exists, force overwrite existing files if older than source files')
 
-    if 'download_data' in commands_to_add:
-        d_parser = parser.add_parser('download_data', help=inspect.getdoc(download_data))
-        d_parser.set_defaults(func=lambda args: download_data(name,args.path,args.datasets))
-        d_parser.add_argument('--path',type=str,help='where to download data',default='%s-examples'%name)
+    if 'fetch-data' in commands_to_add:
+        d_parser = parser.add_parser('fetch-data', help=inspect.getdoc(fetch_data))
+        d_parser.set_defaults(func=lambda args: fetch_data(name,args.path,args.datasets))
+        d_parser.add_argument('--path',type=str,help='where to put data',default='%s-examples'%name)
         d_parser.add_argument('--datasets',type=str,help='*name* of datasets file; must exist either in path specified by --path or in package/examples/',default='datasets.yml')
         d_parser.add_argument('-v', '--verbose', action='count', default=0)
+
+    if 'examples' in commands_to_add:
+        egd_parser = parser.add_parser('examples', help=inspect.getdoc(examples))
+        egd_parser.set_defaults(func=lambda args: examples(name, args.path, args.verbose, args.force))
+        egd_parser.add_argument('--path',type=str,help='location to place examples and data',default='%s-examples'%name)
+        egd_parser.add_argument('-v', '--verbose', action='count', default=0)
+        egd_parser.add_argument('--force', action='store_true', help='if PATH already exists, force overwrite existing examples if older than source examples')
 
 
 def substitute_main(name,cmds=None,args=None):
@@ -355,7 +365,7 @@ def substitute_main(name,cmds=None,args=None):
 
     if cmds is None:
         # again a reg
-        cmds = ['install_examples','download_data']
+        cmds = ['examples','copy-examples','fetch-data']
     
     mod = importlib.import_module(name)
     parser = argparse.ArgumentParser(description="%s commands"%name)
