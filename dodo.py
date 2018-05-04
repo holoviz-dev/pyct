@@ -1,5 +1,5 @@
 import os
-if "PYCT_ECOSYSTEM" not in os.environ:
-    os.environ["PYCT_ECOSYSTEM"] = "pip"
+if "PYCTDEV_ECOSYSTEM" not in os.environ:
+    os.environ["PYCTDEV_ECOSYSTEM"] = "pip"
 
-from pyct import *  # noqa: api
+from pyctdev import *  # noqa: api

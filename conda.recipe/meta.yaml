@@ -1,7 +1,7 @@
 {% set sdata = load_setup_py_data() %}
 
 package:
-  name: pvutil
+  name: pyct
   version: {{ sdata['version'] }}
 
 source:
@@ -23,8 +23,8 @@ requirements:
 
 test:
   imports:
-    - pvutil
-    - pvutil.cmd
+    - pyct
+    - pyct.cmd
 
 about:
   home: {{ sdata['url'] }}

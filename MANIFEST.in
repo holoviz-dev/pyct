@@ -1,2 +1,2 @@
-include pvutil/.version
+include pyct/.version
 include version.py

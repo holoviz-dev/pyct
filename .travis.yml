@@ -29,7 +29,7 @@ jobs:
   
   - &pip_default
     stage: test
-    before_install: pip install pyct && doit ecosystem_setup
+    before_install: pip install pyctdev && doit ecosystem_setup
     install: doit develop_install
     script: doit test_all
 
@@ -53,22 +53,22 @@ jobs:
 
   - &conda_default
     stage: conda_dev_package
-    env: PYCT_ECOSYSTEM=conda
+    env: PYCTDEV_ECOSYSTEM=conda
     before_install:
-      - pip install pyct && doit miniconda_install && pip uninstall -y doit pyct
+      - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
       - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
       - conda config --set always_yes True
-      - conda install -c pyviz/label/dev pyct && doit ecosystem_setup
+      - conda install -c pyviz/label/dev pyctdev && doit ecosystem_setup
     install: doit package_build --test-python=py36 --test-python=py27 --test-group=examples
     script: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev
 
   - &conda_default
     stage: conda_package
-    env: PYCT_ECOSYSTEM=conda
+    env: PYCTDEV_ECOSYSTEM=conda
     before_install:
-      - pip install pyct && doit miniconda_install && pip uninstall -y doit pyct
+      - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
       - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
       - conda config --set always_yes True
-      - conda install -c pyviz/label/dev pyct && doit ecosystem_setup
+      - conda install -c pyviz/label/dev pyctdev && doit ecosystem_setup
     install: doit package_build --test-python=py36 --test-python=py27 --test-group=examples
     script: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main

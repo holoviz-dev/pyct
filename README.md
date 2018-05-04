@@ -14,7 +14,7 @@ Examples...
 $ datashader download_data
 usage: datashader download_data [-h]
 datashader download_data: error: install examples package to enable this command (`conda install datashader-examples`)
-$ conda install -c pyviz pvutil
+$ conda install -c pyviz pyct
 [...]
 $ datashader install_examples
 Installed examples at /tmp/datashader-examples
