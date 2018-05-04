@@ -4,13 +4,13 @@
 
 from __future__ import print_function, absolute_import, division
 
+import os
 import importlib
 import inspect
 import argparse
 import distutils.dir_util
 
-def install_examples(name,path,include_data=False,verbose=False,force=False):
-    """Install examples at the supplied path."""
+def _find_examples(name):
     module_path = os.path.dirname(inspect.getfile(importlib.import_module(name)))
     candidates = [
         # installed package
@@ -18,21 +18,23 @@ def install_examples(name,path,include_data=False,verbose=False,force=False):
         # git repo
         os.path.join(module_path,"..","examples")]
 
-    source = None
     for candidate in candidates:
         if os.path.exists(candidate):
-            source = candidate
-    if source is None:
-        raise ValueError("Could not find examples for %s at any of %s"%(name,candidates))
+            return candidate
 
+    raise ValueError("Could not find examples for %s at any of %s"%(name,candidates))
+    
+
+def install_examples(name,path,include_data=False,verbose=False,force=False):
+    """Install examples at the supplied path."""
+    source = _find_examples(name)
     path = os.path.abspath(path)
     if os.path.exists(path) and not force:
         raise ValueError("Path %s already exists; please move it away, choose a different path, or use force."%path)
-    
-    if verbose: print("Copying examples from %s"%source)
+    if verbose:
+        print("Copying examples from %s"%source)
     distutils.dir_util.copy_tree(source, path, verbose=verbose)
     print("Installed examples at %s"%path)
-        
     if include_data:
         download_data(name,path)
     
@@ -60,7 +62,6 @@ This module provides the progressbar functionality.
 """
 from collections import OrderedDict
 import glob
-import os
 import sys
 import tarfile
 import time
@@ -313,11 +314,9 @@ def download_data(name,path,datasets="datasets.yml"):
     Datasets are downloaded to path/data
     '''
     path = os.path.abspath(path)
-
     info_file = os.path.join(path,datasets)
     if not os.path.exists(info_file):
-        mod = importlib.import_module(name)
-        info_file = os.path.abspath(os.path.join(os.path.dirname(inspect.getfile(mod)),"examples",datasets))
+        info_file = os.path.join(_find_examples(name),datasets)
 
     print("Downloading data defined in %s to %s"%(info_file,os.path.join(path,"data"))) # data is added later...
 
