@@ -1,12 +1,12 @@
 **Experimental**
 
-A 'pyviz cmd util' package that when installed makes
-`install_examples` and `download_data` commands available to other
-packages. (No sophisticated plugin system, just a try import/except in
-the other packages.) The same commands are available from within
-python for users, too. Can either add new subcommands to existing
-argparse based command if module has existing command, or create the
-entire command if module has no existing command.
+A utility package that when installed makes `install_examples` and
+`download_data` commands available to other packages. (No
+sophisticated plugin system, just a try import/except in the other
+packages.) The same commands are available from within python for
+users, too. Can either add new subcommands to an existing argparse
+based command if the module has an existing command, or create the
+entire command if the module has no existing command.
 
 Examples...
 

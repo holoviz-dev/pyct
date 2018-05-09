@@ -4,7 +4,7 @@ import version
 
 setup_args = dict(
     name = 'pyct',
-    description = 'pyviz common tasks (e.g. install examples, download data, ...',
+    description = 'python package common tasks for users (e.g. install examples, download data, ...',
     version = version.get_setup_version('pyct'),
     license = 'BSD-3',
     url = 'http://github.com/pyviz/pyct',
