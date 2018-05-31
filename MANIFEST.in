@@ -1,2 +1,3 @@
 include pyct/.version
 include version.py
+include LICENSE
