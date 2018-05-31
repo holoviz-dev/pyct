@@ -1,99 +1,59 @@
-**Experimental**
+# pyct
 
-A utility package that when installed makes `install_examples` and
-`download_data` commands available to other packages. (No
-sophisticated plugin system, just a try import/except in the other
-packages.) The same commands are available from within python for
-users, too. Can either add new subcommands to an existing argparse
-based command if the module has an existing command, or create the
-entire command if the module has no existing command.
+A utility package that when installed makes various commands available
+to other packages. (Currently no sophisticated plugin system, just a
+try import/except in the other packages.) The same commands are
+available from within python. Can either add new subcommands to an
+existing argparse based command if the module has an existing command,
+or create the entire command if the module has no existing command.
 
-Examples...
+Currently, there are commands for:
 
-```
-$ datashader download_data
-usage: datashader download_data [-h]
-datashader download_data: error: install examples package to enable this command (`conda install datashader-examples`)
-$ conda install -c pyviz pyct
-[...]
-$ datashader install_examples
-Installed examples at /tmp/datashader-examples
-$ python -c "import datashader; datashader.install_examples('test123')"
-Installed examples at /tmp/test123
-```
+  * Copying examples and fetching data
 
+
+## Copying examples and fetching data
+
+To copy the examples of e.g. datashader and download the required data, use the `examples` command:
 
 ```
-$ earthsim
-usage: earthsim [-h] [--version] {install_examples,download_data} ...
-earthsim: error: must supply command to run
-
-$ earthsim --version
-earthsim 1.0.2a0.post26+g9212df2
-
-$ earthsim install_examples --help
-usage: earthsim install_examples [-h] [--path PATH] [--include-data] [-v]
+$ datashader examples --help
+usage: datashader examples [-h] [--path PATH] [-v] [--force]
 
 optional arguments:
-  -h, --help      show this help message and exit
-  --path PATH     where to install examples
-  --include-data  also download data (see download_data command for more flexibility)
+  -h, --help     show this help message and exit
+  --path PATH    location to place examples and data
   -v, --verbose
+  --force        if PATH already exists, force overwrite existing examples if older than source examples
 ```
 
-Can install examples alone:
-```
-$ rm -rf earthsim-examples/
-$ earthsim install_examples --path=earthsim-examples
-Installed examples at /tmp/earthsim-examples
-$ ls earthsim-examples/
-conftest.py  datasets.yml  topics  user_guide  README.md
-```
-
-Or install examples and download data:
-```
-$ rm -rf earthsim-examples/
-$ earthsim install_examples --path=earthsim-examples --include-data
-Installed examples at /tmp/earthsim-examples
-Downloading data defined in /tmp/earthsim-examples/datasets.yml to /tmp/earthsim-examples/data
-Downloading Depth data for the Chesapeake and Delaware Bay region of the USA 1 of 1
-[################################] 20444/20444 - 00:00:05
-Downloading SanDiego mesh data and AdH model output 1 of 1
-[################################] 26161/26161 - 00:00:04
-Downloading Vicksburg watershed shapefile used as GSSHA simulation input 1 of 1
-[################################] 4/4 - 00:00:00
-$ ls earthsim-examples/
-conftest.py  data  datasets.yml  topics  user_guide  README.md
-```
-
-Note: will not overwrite existing path.
-
-Can also download data alone:
+To copy the examples of e.g. datashader but not download the data, use the `copy-examples` command:
 
 ```
-$ earthsim download_data --help
-usage: earthsim download_data [-h] [--path PATH] [--datasets-filename DATASETS_FILENAME] [-v]
+usage: datashader copy-examples [-h] [--path PATH] [-v] [--force]
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --path PATH           where to download data
-  --datasets-filename DATASETS_FILENAME
-                        something
+  -h, --help     show this help message and exit
+  --path PATH    where to copy examples
   -v, --verbose
-
-$ earthsim download_data --path earthsim-examples
-Downloading data defined in /tmp/earthsim-examples/datasets.yml to /tmp/earthsim-examples/data
-Skipping Depth data for the Chesapeake and Delaware Bay region of the USA
-Skipping SanDiego mesh data and AdH model output
-Skipping Vicksburg watershed shapefile used as GSSHA simulation input
+  --force        if PATH already exists, force overwrite existing examples if older than source examples
 ```
 
+To download the data only, use the `fetch-data` command:
+
+```
+usage: datashader fetch-data [-h] [--path PATH] [--datasets DATASETS] [-v]
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --path PATH          where to put data
+  --datasets DATASETS  *name* of datasets file; must exist either in path specified by --path or in package/examples/
+  -v, --verbose
+```
 
 Can specify different 'datasets' file:
 
 ```
-$ cp earthsim-examples/datasets.yml earthsim-examples/test.yml
-$ # (edit test.yaml)
 $ cat earthsim-examples/test.yml
 ---
 
@@ -104,18 +64,7 @@ data:
     files:
       - Chesapeake_and_Delaware_Bays.3dm
 
-$ earthsim download_data --path earthsim-examples --datasets-filename test.yml
+$ earthsim fetch-data --path earthsim-examples --datasets-filename test.yml
 Downloading data defined in /tmp/earthsim-examples/test.yml to /tmp/earthsim-examples/data
 Skipping Depth data for the Chesapeake and Delaware Bay region of the USA
-```
-
-If there's no datasets-filename in the specified path, looks for it in the package (in package/examples/):
-
-```
-$ rm earthsim-examples/datasets.yml
-$ earthsim download_data --path earthsim-examples
-Downloading data defined in /EarthSim/earthsim/examples/datasets.yml to /tmp/earthsim-examples/data
-Skipping Depth data for the Chesapeake and Delaware Bay region of the USA
-Skipping SanDiego mesh data and AdH model output
-Skipping Vicksburg watershed shapefile used as GSSHA simulation input
 ```
