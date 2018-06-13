@@ -330,29 +330,34 @@ def fetch_data(name,path,datasets="datasets.yml"):
                 _process_dataset(d, output_dir, path)
 
 
+# TODO: cmds=None defaults to 'all', basically, which is a bit confusing
 
 # the alternative is a plugin system?
-def add_pv_commands(parser,commands_to_add,name,args):
-    # use to add just specified commands (see substitute_main for alternative)
+def add_commands(parser,name,cmds=None,args=None):
+    # use to add commands to existing parser (see substitute_main for alternative)
 
     # TODO: should be cleaned up
-    
+
+    if cmds is None:
+        # again a reg (duplicated in substitute_main)
+        cmds = ['examples','copy-examples','fetch-data']
+
     # use dict/reg instead
-    if 'copy-examples' in commands_to_add:
+    if 'copy-examples' in cmds:
         eg_parser = parser.add_parser('copy-examples', help=inspect.getdoc(copy_examples))
         eg_parser.set_defaults(func=lambda args: copy_examples(name, args.path, args.verbose, args.force))
         eg_parser.add_argument('--path',type=str,help='where to copy examples',default='%s-examples'%name)
         eg_parser.add_argument('-v', '--verbose', action='count', default=0)
         eg_parser.add_argument('--force', action='store_true', help='if PATH already exists, force overwrite existing files if older than source files')
 
-    if 'fetch-data' in commands_to_add:
+    if 'fetch-data' in cmds:
         d_parser = parser.add_parser('fetch-data', help=inspect.getdoc(fetch_data))
         d_parser.set_defaults(func=lambda args: fetch_data(name,args.path,args.datasets))
         d_parser.add_argument('--path',type=str,help='where to put data',default='%s-examples'%name)
         d_parser.add_argument('--datasets',type=str,help='*name* of datasets file; must exist either in path specified by --path or in package/examples/',default='datasets.yml')
         d_parser.add_argument('-v', '--verbose', action='count', default=0)
 
-    if 'examples' in commands_to_add:
+    if 'examples' in cmds:
         egd_parser = parser.add_parser('examples', help=inspect.getdoc(examples))
         egd_parser.set_defaults(func=lambda args: examples(name, args.path, args.verbose, args.force))
         egd_parser.add_argument('--path',type=str,help='location to place examples and data',default='%s-examples'%name)
@@ -371,7 +376,7 @@ def substitute_main(name,cmds=None,args=None):
     parser = argparse.ArgumentParser(description="%s commands"%name)
     parser.add_argument('--version', action='version', version='%(prog)s '+mod.__version__)
     subparsers = parser.add_subparsers(title='available commands')
-    add_pv_commands(subparsers,cmds,name,args)
+    add_commands(subparsers,name,cmds,args)
     args = parser.parse_args()
     args.func(args) if hasattr(args,'func') else parser.error("must supply command to run") 
     
