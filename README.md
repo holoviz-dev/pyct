@@ -1,15 +1,18 @@
 # pyct
 
-A utility package that when installed makes various commands available
-to other packages. (Currently no sophisticated plugin system, just a
-try import/except in the other packages.) The same commands are
-available from within python. Can either add new subcommands to an
-existing argparse based command if the module has an existing command,
-or create the entire command if the module has no existing command.
+A utility package that:
 
-Currently, there are commands for:
+  1. makes various commands available to other packages. (Currently no
+     sophisticated plugin system, just a try import/except in the
+     other packages.) The same commands are available from within
+     python. Can either add new subcommands to an existing argparse
+     based command if the module has an existing command, or create
+     the entire command if the module has no existing
+     command. Currently, there are commands for copying examples and
+     fetching data.
 
-  * Copying examples and fetching data
+  2. provides various commands to help package building
+     (e.g. packaging examples)
 
 
 ## Copying examples and fetching data
