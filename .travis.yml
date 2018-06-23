@@ -59,7 +59,7 @@ jobs:
       - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
       - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
       - conda config --set always_yes True
-      - conda install -c $CHANS pyctdev && doit ecosystem_setup
+      - conda install $CHANS pyctdev && doit ecosystem_setup
     install:
       - doit package_build --recipe=core $PKG_TEST_PYTHON --test-group=build_examples
       - doit package_build               $PKG_TEST_PYTHON --test-group=cmd_examples
