@@ -8,8 +8,8 @@ language: generic
 env:
   global:
     - PYENV_VERSION=3.6
-    - CONDA_CHANS_DEV="-c pyviz/label/dev"
-    - CONDA_CHANS_REL="-c pyviz"
+    - CHANS_DEV="-c pyviz/label/dev"
+    - CHANS_REL="-c pyviz"
     - LABELS_DEV="--label=dev"
     - LABELS_REL="--label=dev --label=main"    
     - PKG_TEST_PYTHON="--test-python=py36 --test-python=py27"
@@ -54,7 +54,7 @@ jobs:
 
   - &conda_default
     stage: conda_dev_package
-    env: PYCTDEV_ECOSYSTEM=conda CHANS=CHANS_DEV LABELS=LABELS_DEV
+    env: PYCTDEV_ECOSYSTEM=conda CHANS=$CHANS_DEV LABELS=$LABELS_DEV
     before_install:
       - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
       - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
@@ -68,4 +68,4 @@ jobs:
 
   - <<: *conda_default
     stage: conda_package
-    env: PYCTDEV_ECOSYSTEM=conda CHANS=CHANS_REL LABELS=LABELS_DEV
+    env: PYCTDEV_ECOSYSTEM=conda CHANS=$CHANS_REL LABELS=$LABELS_REL
