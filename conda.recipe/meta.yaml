@@ -13,7 +13,7 @@ build:
 requirements:
   host:
     - python
-    - setuptools
+    - setuptools >=0.30.3
     - param
   run:
     - python {{ sdata['python_requires'] }}
