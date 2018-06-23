@@ -1,5 +1,5 @@
 [build-system]
 requires = [
     "param",
-    "setuptools >=0.30.3"
+    "setuptools >=30.3.0"
 ]
