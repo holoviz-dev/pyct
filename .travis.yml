@@ -8,6 +8,11 @@ language: generic
 env:
   global:
     - PYENV_VERSION=3.6
+    - CONDA_CHANS_DEV="-c pyviz/label/dev"
+    - CONDA_CHANS_REL="-c pyviz"
+    - LABELS_DEV="--label=dev"
+    - LABELS_REL="--label=dev --label=main"    
+    - PKG_TEST_PYTHON="--test-python=py36 --test-python=py27"
 
 stages:
   - test
@@ -23,52 +28,44 @@ stages:
 jobs:
   include:
 
-  ########## TEST DEVELOPER INSTALL ##########  
+  ########## DEVELOPER INSTALL ##########  
 
-  ## pip
-  
   - &pip_default
     stage: test
     before_install: pip install pyctdev && doit ecosystem_setup
-    install: doit develop_install
+    install: doit develop_install -o cmd
     script: doit test_all
 
   ########## END-USER PACKAGES ##########
 
-  - <<: *pip_default
+  - &pip_pkg_default
+    <<: *pip_default
     stage: pip_dev_package
-    env: PYPI="https://test.pypi.org/legacy/"
+    env: PP=testpypi PPU=$TPYPIU PPP=$TPYPIP
     install:
       - unset PYENV_VERSION && pyenv global 3.6 2.7
-      - doit package_build --test-group=examples --test-python=py36 --test-python=py27
-    script: doit package_upload -u $TPYPIU -p $TPYPIP -r ${PYPI}
+      - doit package_build --test-group=build_examples $PKG_TEST_PYTHON
+      - doit package_build --test-group=cmd_examples $PKG_TEST_PYTHON
+    script: doit package_upload -u $PPU -p $PPP --pypi $PP
 
-  - <<: *pip_default
+  - <<: *pip_pkg_default
     stage: pip_package
-    env: PYPI="https://upload.pypi.org/legacy/"
-    install:
-      - unset PYENV_VERSION && pyenv global 3.6 2.7
-      - doit package_build --test-group=examples --test-python=py36 --test-python=py27
-    script: doit package_upload -u $PYPIU -p $PYPIP -r ${PYPI}
+    env: PP=pypi PPU=$PYPIU PPP=$PYPIP
 
   - &conda_default
     stage: conda_dev_package
-    env: PYCTDEV_ECOSYSTEM=conda
+    env: PYCTDEV_ECOSYSTEM=conda CHANS=CHANS_DEV LABELS=LABELS_DEV
     before_install:
       - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
       - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
       - conda config --set always_yes True
-      - conda install -c pyviz/label/dev pyctdev && doit ecosystem_setup
-    install: doit package_build --test-python=py36 --test-python=py27 --test-group=examples
-    script: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev
+      - conda install -c $CHANS pyctdev && doit ecosystem_setup
+    install:
+      - doit package_build --recipe=core $PKG_TEST_PYTHON --test-group=build_examples
+      - doit package_build               $PKG_TEST_PYTHON --test-group=cmd_examples
+    script:
+      - doit package_upload --token=$CONDA_UPLOAD_TOKEN $LABELS
 
-  - &conda_default
+  - <<: *conda_default
     stage: conda_package
-    env: PYCTDEV_ECOSYSTEM=conda
-    before_install:
-      - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
-      - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
-      - conda config --set always_yes True
-      - conda install -c pyviz/label/dev pyctdev && doit ecosystem_setup
-    install: doit package_build --test-python=py36 --test-python=py27 --test-group=examples
-    script: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main
+    env: PYCTDEV_ECOSYSTEM=conda CHANS=CHANS_REL LABELS=LABELS_DEV

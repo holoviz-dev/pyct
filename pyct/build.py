@@ -28,13 +28,17 @@ def examples(path, root, verbose=False, force=False):
 def get_setup_version2():
     # Simpler get_setup_version() for setup.cfg files.
     # Requires [tool:autover] in setup.cfg
-    from param.version import Version # undeclared dependency, but this fn should move to version anyway
-    import configparser # TODO: check this works on py2 also
+    from param.version import Version # undeclared dependency, but this fn will move to version anyway
+    try:
+        import configparser
+    except ImportError:
+        import ConfigParser as configparser
     import warnings
     config = configparser.ConfigParser()
     config.read("setup.cfg")
-    reponame = config['tool:autover']['reponame']
-    pkgname = config['tool:autover'].get('pkgname',reponame)
+    
+    reponame = config.get('tool:autover','reponame')
+    pkgname = config.get('tool:autover','pkgname',vars={'pkgname':reponame})
 
     ###
     # setuptools requires % to be escaped with % or it can't parse
