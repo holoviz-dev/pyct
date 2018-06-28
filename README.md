@@ -1,20 +1,29 @@
 # pyct
 
-A utility package that when installed makes various commands available
-to other packages. (Currently no sophisticated plugin system, just a
-try import/except in the other packages.) The same commands are
-available from within python. Can either add new subcommands to an
-existing argparse based command if the module has an existing command,
-or create the entire command if the module has no existing command.
+A utility package that includes:
 
-Currently, there are commands for:
+  1. **pyct.cmd**: Makes various commands available to other
+     packages. (Currently no sophisticated plugin system, just a try
+     import/except in the other packages.) The same commands are
+     available from within python. Can either add new subcommands to
+     an existing argparse based command if the module has an existing
+     command, or create the entire command if the module has no
+     existing command. Currently, there are commands for copying
+     examples and fetching data. See
 
-  * Copying examples and fetching data
+  2. **pyct.build**: Provides various commands to help package
+     building, primarily as a convenience for project maintainers.
 
+## pyct.cmd
 
-## Copying examples and fetching data
+To install pyct with the dependencies required for pyct.cmd: `pip
+install pyct[cmd]` or `conda install -c pyviz pyct`.
 
-To copy the examples of e.g. datashader and download the required data, use the `examples` command:
+An example of how to use in a project:
+https://github.com/ioam/geoviews/blob/master/geoviews/__main__.py
+
+Once added, users can copy the examples of a package and download the
+required data with the `examples` command:
 
 ```
 $ datashader examples --help
@@ -27,7 +36,8 @@ optional arguments:
   --force        if PATH already exists, force overwrite existing examples if older than source examples
 ```
 
-To copy the examples of e.g. datashader but not download the data, use the `copy-examples` command:
+To copy the examples of e.g. datashader but not download the data,
+there's a `copy-examples` command:
 
 ```
 usage: datashader copy-examples [-h] [--path PATH] [-v] [--force]
@@ -39,7 +49,7 @@ optional arguments:
   --force        if PATH already exists, force overwrite existing examples if older than source examples
 ```
 
-To download the data only, use the `fetch-data` command:
+And to download the data only, the `fetch-data` command:
 
 ```
 usage: datashader fetch-data [-h] [--path PATH] [--datasets DATASETS] [-v]
@@ -68,3 +78,12 @@ $ earthsim fetch-data --path earthsim-examples --datasets-filename test.yml
 Downloading data defined in /tmp/earthsim-examples/test.yml to /tmp/earthsim-examples/data
 Skipping Depth data for the Chesapeake and Delaware Bay region of the USA
 ```
+
+
+## pyct.build
+
+Currently provides a way to package examples with a project, by
+copying an examples folder into the package directory whenever
+setup.py is run. The way this works is likely to change in the near
+future, but is provided here as the first step towards
+unifying/simplifying the maintenance of a number of pyviz projects.

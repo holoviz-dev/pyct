@@ -1,31 +1,26 @@
-from setuptools import setup, find_packages
+from setuptools import setup
+####
+# Build dependency checks
+#
+# Temporary, until pyproject.toml is widely supported. We're expecting
+# most users to install a wheel or conda package, neither of which
+# requires running setup.py and building a package.  So these checks
+# are for packagers and those installing from e.g. github.
+import setuptools
+from pkg_resources import parse_version
+missing_build_dep = False
+if parse_version(setuptools.__version__)<parse_version('30.3.0'):
+    missing_build_dep = True
+try:
+    import param
+    if parse_version(param.__version__)<parse_version('1.7.0'):
+        missing_build_dep = True
+except:
+    missing_build_dep = True
 
-import version
-
-setup_args = dict(
-    name = 'pyct',
-    description = 'python package common tasks for users (e.g. copy examples, fetch data, ...)',
-    version = version.get_setup_version('pyct'),
-    license = 'BSD-3',
-    long_description=open("README.md").read(),
-    long_description_content_type="text/markdown",    
-    url = 'http://github.com/pyviz/pyct',
-    packages = find_packages(),
-    python_requires=">=2.7",
-    include_package_data = True,
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Programming Language :: Python :: 2.7',        
-        'Programming Language :: Python :: 3',
-        'Operating System :: OS Independent',
-        'License :: OSI Approved :: BSD License',
-    ],    
-    install_requires=[
-        'pyyaml',
-        'requests'
-    ],
-    extras_require={'tests': ['flake8']}
-)
+if missing_build_dep:
+    raise ValueError('Building pyct requires setuptools>=30.3.0 and param>=1.7.0; please upgrade to pip>=10 and try again. Alternatively, install the build dependencies manually first (e.g. `pip install --upgrade "setuptools>=30.3.0" "param>=1.7.0"` or `conda install -c pyviz "setuptools>=30.3.0" "param>=1.7.0"`)')
+#####
 
 if __name__ == "__main__":
-    setup(**setup_args)
+    setup()

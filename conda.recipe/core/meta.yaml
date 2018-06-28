@@ -1,14 +1,15 @@
 {% set sdata = load_setup_py_data() %}
 
 package:
-  name: pyct
+  name: pyct-core
   version: {{ sdata['version'] }}
 
 source:
-  path: ..
+  path: ../..
 
 build:
   noarch: python
+  script: python setup.py install --single-version-externally-managed --record=record.txt
 
 requirements:
   host:
@@ -17,15 +18,14 @@ requirements:
     - param >=1.7.0
   run:
     - python {{ sdata['python_requires'] }}
-    - pyct-core ={{ sdata['version'] }}
-    {% for dep in sdata['extras_require']['cmd'] %}
+    {% for dep in sdata.get('install_requires',{}) %}
     - {{ dep }}
     {% endfor %}
 
 test:
   imports:
     - pyct
-    - pyct.cmd
+    - pyct.build
 
 about:
   home: {{ sdata['url'] }}
