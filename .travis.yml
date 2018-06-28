@@ -61,8 +61,8 @@ jobs:
       - conda config --set always_yes True
       - conda install $CHANS pyctdev && doit ecosystem_setup
     install:
-      - doit package_build --recipe=core $PKG_TEST_PYTHON --test-group=build_examples
-      - doit package_build               $PKG_TEST_PYTHON --test-group=cmd_examples
+      - doit package_build --recipe=core $PKG_TEST_PYTHON --test-group=build_examples $CHANS
+      - doit package_build               $PKG_TEST_PYTHON --test-group=cmd_examples   $CHANS
     script:
       - doit package_upload --token=$CONDA_UPLOAD_TOKEN $LABELS
 
