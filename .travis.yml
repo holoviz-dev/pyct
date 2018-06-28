@@ -33,7 +33,7 @@ jobs:
   - &pip_default
     stage: test
     before_install: pip install pyctdev && doit ecosystem_setup
-    install: doit develop_install -o cmd -c testpypi
+    install: doit develop_install -o cmd
     script: doit test_all
 
   ########## END-USER PACKAGES ##########
