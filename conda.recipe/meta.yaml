@@ -14,7 +14,7 @@ requirements:
   host:
     - python
     - setuptools >=30.3.0
-    - param
+    - param >=1.7.0
   run:
     - python {{ sdata['python_requires'] }}
     - pyct-core ={{ sdata['version'] }}
