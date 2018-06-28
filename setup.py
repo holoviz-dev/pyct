@@ -12,8 +12,7 @@ missing_build_dep = False
 if parse_version(setuptools.__version__)<parse_version('30.3.0'):
     missing_build_dep = True
 try:
-    import pyct.build # noqa: TODO will be removed when param supplies get_setup_version2()
-    import param      # noqa: see missing dep message below
+    import param
     if parse_version(param.__version__)<parse_version('1.6.1'):
         missing_build_dep = True
 except:
