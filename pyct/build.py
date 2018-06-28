@@ -1,6 +1,5 @@
 import os
 import shutil
-import re
 
 def examples(path, root, verbose=False, force=False):
     """
