@@ -12,6 +12,8 @@ build:
   script: python setup.py install --single-version-externally-managed --record=record.txt
 
 requirements:
+  run_constrained:
+    - pyct {{ sdata['version'] }}
   host:
     - python
     - setuptools >=30.3.0
