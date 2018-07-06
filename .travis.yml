@@ -64,6 +64,7 @@ jobs:
       - doit package_build --recipe=core $PKG_TEST_PYTHON --test-group=build_examples $CHANS
       - doit package_build               $PKG_TEST_PYTHON --test-group=cmd_examples   $CHANS
     script:
+      - doit package_upload --token=$CONDA_UPLOAD_TOKEN $LABELS --recipe=core
       - doit package_upload --token=$CONDA_UPLOAD_TOKEN $LABELS
 
   - <<: *conda_default
