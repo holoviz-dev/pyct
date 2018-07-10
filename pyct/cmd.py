@@ -321,7 +321,7 @@ def fetch_data(name,path,datasets="datasets.yml",require_datasets=True):
         info_file = os.path.join(_find_examples(name),datasets)
 
     if not os.path.exists(info_file) and require_datasets is False:
-        print("No datasets to download") # data is added later...
+        print("No datasets to download")
         return
         
     print("Fetching data defined in %s and placing in %s"%(info_file,os.path.join(path,"data"))) # data is added later...
