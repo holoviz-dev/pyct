@@ -25,9 +25,9 @@ def _find_examples(name):
     raise ValueError("Could not find examples for %s at any of %s"%(name,candidates))
 
 def examples(name,path,verbose=False,force=False):
-    """Copy examples and fetch data to the supplied path. See copy-examples and fetch-data for more flexibility."""
+    """Copy examples and fetch data (if any) to the supplied path. See copy-examples and fetch-data for more flexibility."""
     copy_examples(name, path, verbose, force)
-    fetch_data(name,path)
+    fetch_data(name,path,require_datasets=False)
 
 
 def copy_examples(name,path,verbose=False,force=False):
@@ -310,7 +310,7 @@ def _process_dataset(dataset, output_dir, here):
         print('this download script requires the requests module: conda install requests')
         sys.exit(1)
 
-def fetch_data(name,path,datasets="datasets.yml"):
+def fetch_data(name,path,datasets="datasets.yml",require_datasets=True):
     '''Fetch sample datasets as defined by path/datasets if it exists or else module's own examples/datasets otherwise.
 
     Datasets are placed in path/data
@@ -320,6 +320,10 @@ def fetch_data(name,path,datasets="datasets.yml"):
     if not os.path.exists(info_file):
         info_file = os.path.join(_find_examples(name),datasets)
 
+    if not os.path.exists(info_file) and require_datasets is False:
+        print("No datasets to download") # data is added later...
+        return
+        
     print("Fetching data defined in %s and placing in %s"%(info_file,os.path.join(path,"data"))) # data is added later...
 
     with open(info_file) as f:
