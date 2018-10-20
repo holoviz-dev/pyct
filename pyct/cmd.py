@@ -9,6 +9,7 @@ import importlib
 import inspect
 import argparse
 import distutils.dir_util
+import shutil
 
 def _find_examples(name):
     module_path = os.path.dirname(inspect.getfile(importlib.import_module(name)))
@@ -254,7 +255,7 @@ def _extract_downloaded_archive(output_path):
         os.remove(output_path)
 
 
-def _process_dataset(dataset, output_dir, here):
+def _process_dataset(dataset, output_dir, here, use_test_data=False, force=False):
     '''Process each download spec in datasets.yml
 
     Typically each dataset list entry in the yml has
@@ -276,7 +277,7 @@ def _process_dataset(dataset, output_dir, here):
                 requires_download = True
                 break
 
-        if not requires_download:
+        if force is False and not requires_download:
             print('Skipping {0}'.format(dataset['title']))
             return
         url = dataset['url']
@@ -297,20 +298,26 @@ def _process_dataset(dataset, output_dir, here):
         zipped = zip(urls, output_paths, unpacked)
         for idx, (url, output_path, unpack) in enumerate(zipped):
             running_title = title_fmt.format(idx + 1, len(urls))
-            if glob.glob(unpack) or os.path.exists(unpack.replace('*','')):
+            if force is False and (glob.glob(unpack) or os.path.exists(unpack.replace('*',''))):
                 # Skip a file if a similar one is downloaded:
                 # i.e. one that has same name but dif't extension
                 print('Skipping {0}'.format(running_title))
                 continue
-            _url_to_binary_write(url, output_path, running_title)
-            _extract_downloaded_archive(output_path)
+            if use_test_data and 'test_files' in dataset:
+                test = output_dir+"/"+dataset['test_files'][idx]
+                target = output_dir+"/"+unpack
+                print("Copying test data file '{0}' to '{1}'".format(test, target))
+                shutil.copyfile(test, target)
+            else:
+                _url_to_binary_write(url, output_path, running_title)
+                _extract_downloaded_archive(output_path)
 
 
     if requests is None:
         print('this download script requires the requests module: conda install requests')
         sys.exit(1)
 
-def fetch_data(name,path,datasets="datasets.yml",require_datasets=True):
+def fetch_data(name,path,datasets="datasets.yml",require_datasets=True,use_test_data=False,force=False):
     '''Fetch sample datasets as defined by path/datasets if it exists or else module's own examples/datasets otherwise.
 
     Datasets are placed in path/data
@@ -331,7 +338,7 @@ def fetch_data(name,path,datasets="datasets.yml",require_datasets=True):
         for topic, downloads in info.items():
             output_dir = os.path.join(path, topic)
             for d in downloads:
-                _process_dataset(d, output_dir, path)
+                _process_dataset(d, output_dir, path, use_test_data=use_test_data, force=force)
 
 
 # TODO: cmds=None defaults to 'all', basically, which is a bit confusing
@@ -356,10 +363,12 @@ def add_commands(parser,name,cmds=None,args=None):
 
     if 'fetch-data' in cmds:
         d_parser = parser.add_parser('fetch-data', help=inspect.getdoc(fetch_data))
-        d_parser.set_defaults(func=lambda args: fetch_data(name,args.path,args.datasets))
+        d_parser.set_defaults(func=lambda args: fetch_data(name,args.path,args.datasets,use_test_data=args.use_test_data,force=args.force))
         d_parser.add_argument('--path',type=str,help='where to put data',default='%s-examples'%name)
         d_parser.add_argument('--datasets',type=str,help='*name* of datasets file; must exist either in path specified by --path or in package/examples/',default='datasets.yml')
         d_parser.add_argument('-v', '--verbose', action='count', default=0)
+        d_parser.add_argument('--force',action='store_true', help='Force any existing data files to be replaced')
+        d_parser.add_argument('--use-test-data',action='store_true', help="Use data's 'test_files', if any, instead of fetching full data. If no test_files defined, fall back to fetching full data.")
 
     if 'examples' in cmds:
         egd_parser = parser.add_parser('examples', help=inspect.getdoc(examples))
@@ -367,7 +376,7 @@ def add_commands(parser,name,cmds=None,args=None):
         egd_parser.add_argument('--path',type=str,help='location to place examples and data',default='%s-examples'%name)
         egd_parser.add_argument('-v', '--verbose', action='count', default=0)
         egd_parser.add_argument('--force', action='store_true', help='if PATH already exists, force overwrite existing examples if older than source examples')
-
+        # TODO: support use-test-data, force-data
 
 def substitute_main(name,cmds=None,args=None):
     # can use if your module has no other commands
