@@ -81,7 +81,7 @@ except ImportError:
 #        print('this download script requires the requests module: conda install requests')
 #        sys.exit(1)
 
-    
+
 STREAM = sys.stderr
 
 BAR_TEMPLATE = '%s[%s%s] %i/%i - %s\r'
@@ -97,6 +97,7 @@ ETA_INTERVAL = 1
 # How many intervals (excluding the current one) to calculate the simple moving
 # average
 ETA_SMA_WINDOW = 9
+DATA_STUBS_DIR = '.data_stubs'
 
 
 class Bar(object):
@@ -303,14 +304,16 @@ def _process_dataset(dataset, output_dir, here, use_test_data=False, force=False
                 # i.e. one that has same name but dif't extension
                 print('Skipping {0}'.format(running_title))
                 continue
-            if use_test_data and 'test_files' in dataset:
-                test = output_dir+"/"+dataset['test_files'][idx]
+            test = os.path.join(output_dir, DATA_STUBS_DIR, unpack)
+            if use_test_data and os.path.exists(test):
                 target = output_dir+"/"+unpack
                 print("Copying test data file '{0}' to '{1}'".format(test, target))
                 shutil.copyfile(test, target)
-            else:
-                _url_to_binary_write(url, output_path, running_title)
-                _extract_downloaded_archive(output_path)
+                continue
+            elif use_test_data and not os.path.exists(test):
+                print("Missing test file: {}. Using regular file instead".format(test))
+            _url_to_binary_write(url, output_path, running_title)
+            _extract_downloaded_archive(output_path)
 
 
     if requests is None:
@@ -330,7 +333,7 @@ def fetch_data(name,path,datasets="datasets.yml",require_datasets=True,use_test_
     if not os.path.exists(info_file) and require_datasets is False:
         print("No datasets to download")
         return
-        
+
     print("Fetching data defined in %s and placing in %s"%(info_file,os.path.join(path,"data"))) # data is added later...
 
     with open(info_file) as f:
@@ -384,12 +387,12 @@ def substitute_main(name,cmds=None,args=None):
     if cmds is None:
         # again a reg
         cmds = ['examples','copy-examples','fetch-data']
-    
+
     mod = importlib.import_module(name)
     parser = argparse.ArgumentParser(description="%s commands"%name)
     parser.add_argument('--version', action='version', version='%(prog)s '+mod.__version__)
     subparsers = parser.add_subparsers(title='available commands')
     add_commands(subparsers,name,cmds,args)
     args = parser.parse_args()
-    args.func(args) if hasattr(args,'func') else parser.error("must supply command to run") 
-    
+    args.func(args) if hasattr(args,'func') else parser.error("must supply command to run")
+
