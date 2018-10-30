@@ -364,11 +364,15 @@ def clean_data(name, path):
             continue
 
         test_file = os.path.join(test_dir, f)
-        if os.path.isfile(test_file) and (os.path.getsize(data_file) == os.path.getsize(test_file)):
-            print("Removing copied test file:", f)
-            os.remove(data_file)
-        else:
-            print("Size of test file {:e} did not match size of data file {:e}", test_s, data_s)
+        if os.path.isfile(test_file):
+            data_s = os.path.getsize(data_file)
+            test_s = os.path.getsize(test_file)
+            if data_s == test_s:
+                print("Removing copied test file:", f)
+                os.remove(data_file)
+            else:
+                print("Size of test file {:.2e} did not match "
+                      "size of data file {:.2e}".format(test_s, data_s))
 
 
 # TODO: cmds=None defaults to 'all', basically, which is a bit confusing
