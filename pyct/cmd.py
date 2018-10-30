@@ -97,6 +97,7 @@ ETA_INTERVAL = 1
 # How many intervals (excluding the current one) to calculate the simple moving
 # average
 ETA_SMA_WINDOW = 9
+DATA_DIR = 'data'
 DATA_STUBS_DIR = '.data_stubs'
 
 
@@ -285,7 +286,7 @@ def _process_dataset(dataset, output_dir, here, use_test_data=False, force=False
         title_fmt = dataset['title'] + ' {} of {}'
         if url.endswith('/'):
             urls = [url + f for f in dataset['files']]
-            output_paths = [os.path.join(here, 'data', fname)
+            output_paths = [os.path.join(here, DATA_DIR, fname)
                             for fname in dataset['files']]
 
             unpacked = ['.'.join(output_path.split('.')[:(-2 if output_path.endswith('gz') else -1)]) + '*'
@@ -343,6 +344,32 @@ def fetch_data(name,path,datasets="datasets.yml",require_datasets=True,use_test_
             for d in downloads:
                 _process_dataset(d, output_dir, path, use_test_data=use_test_data, force=force)
 
+def clean_data(name, path):
+    '''Remove up any data files that are copied from test files
+    '''
+    path = os.path.abspath(path)
+    if not os.path.exists(path):
+        path = _find_examples(name)
+
+    data_dir = os.path.join(path, DATA_DIR)
+    test_dir = os.path.join(data_dir, DATA_STUBS_DIR)
+    if not os.path.exists(test_dir) or len(os.listdir(test_dir)) == 0:
+        print("No test files found")
+        return
+
+    for f in os.listdir(test_dir):
+        data_file = os.path.join(data_dir, f)
+        if not os.path.isfile(data_file):
+            print("Test file was not copied to data:", f)
+            continue
+
+        test_file = os.path.join(test_dir, f)
+        if os.path.isfile(test_file) and (os.path.getsize(data_file) == os.path.getsize(test_file)):
+            print("Removing copied test file:", f)
+            os.remove(data_file)
+        else:
+            print("Size of test file {:e} did not match size of data file {:e}", test_s, data_s)
+
 
 # TODO: cmds=None defaults to 'all', basically, which is a bit confusing
 
@@ -381,12 +408,17 @@ def add_commands(parser,name,cmds=None,args=None):
         egd_parser.add_argument('--force', action='store_true', help='if PATH already exists, force overwrite existing examples if older than source examples')
         # TODO: support use-test-data, force-data
 
+    if 'clean-data' in cmds:
+        d_parser = parser.add_parser('clean-data', help=inspect.getdoc(clean_data))
+        d_parser.set_defaults(func=lambda args: clean_data(name,args.path))
+        d_parser.add_argument('--path',type=str,help='where to clean data',default='%s-examples'%name)
+
 def substitute_main(name,cmds=None,args=None):
     # can use if your module has no other commands
 
     if cmds is None:
         # again a reg
-        cmds = ['examples','copy-examples','fetch-data']
+        cmds = ['examples','copy-examples','fetch-data', 'clean-data']
 
     mod = importlib.import_module(name)
     parser = argparse.ArgumentParser(description="%s commands"%name)
