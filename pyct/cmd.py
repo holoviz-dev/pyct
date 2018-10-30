@@ -25,10 +25,18 @@ def _find_examples(name):
 
     raise ValueError("Could not find examples for %s at any of %s"%(name,candidates))
 
-def examples(name,path,verbose=False,force=False):
-    """Copy examples and fetch data (if any) to the supplied path. See copy-examples and fetch-data for more flexibility."""
+def examples(name,path,verbose=False,use_test_data=False,force=False):
+    """
+    Copy examples and fetch data (if any) to the supplied path.
+    See copy-examples and fetch-data for more flexibility.
+
+    NOTE: force operates both on example and data over-writing
+    pre-existing files.
+    """
     copy_examples(name, path, verbose, force)
-    fetch_data(name,path,require_datasets=False)
+    fetch_data(name,path,require_datasets=False,use_test_data=use_test_data,force=force)
+    if use_test_data:
+        clean_data(name,path)
 
 
 def copy_examples(name,path,verbose=False,force=False):
@@ -307,12 +315,12 @@ def _process_dataset(dataset, output_dir, here, use_test_data=False, force=False
                 continue
             test = os.path.join(output_dir, DATA_STUBS_DIR, unpack)
             if use_test_data and os.path.exists(test):
-                target = output_dir+"/"+unpack
+                target = os.path.join(output_dir, unpack)
                 print("Copying test data file '{0}' to '{1}'".format(test, target))
                 shutil.copyfile(test, target)
                 continue
             elif use_test_data and not os.path.exists(test):
-                print("Missing test file: {}. Using regular file instead".format(test))
+                print("No test file found for: {}. Using regular file instead".format(test))
             _url_to_binary_write(url, output_path, running_title)
             _extract_downloaded_archive(output_path)
 
@@ -335,7 +343,7 @@ def fetch_data(name,path,datasets="datasets.yml",require_datasets=True,use_test_
         print("No datasets to download")
         return
 
-    print("Fetching data defined in %s and placing in %s"%(info_file,os.path.join(path,"data"))) # data is added later...
+    print("Fetching data defined in %s and placing in %s"%(info_file,os.path.join(path,DATA_DIR))) # data is added later...
 
     with open(info_file) as f:
         info = ordered_load(f.read())
@@ -385,7 +393,7 @@ def add_commands(parser,name,cmds=None,args=None):
 
     if cmds is None:
         # again a reg (duplicated in substitute_main)
-        cmds = ['examples','copy-examples','fetch-data']
+        cmds = ['examples','copy-examples','fetch-data','clean-data']
 
     # use dict/reg instead
     if 'copy-examples' in cmds:
@@ -402,20 +410,26 @@ def add_commands(parser,name,cmds=None,args=None):
         d_parser.add_argument('--datasets',type=str,help='*name* of datasets file; must exist either in path specified by --path or in package/examples/',default='datasets.yml')
         d_parser.add_argument('-v', '--verbose', action='count', default=0)
         d_parser.add_argument('--force',action='store_true', help='Force any existing data files to be replaced')
-        d_parser.add_argument('--use-test-data',action='store_true', help="Use data's 'test_files', if any, instead of fetching full data. If no test_files defined, fall back to fetching full data.")
+        d_parser.add_argument('--use-test-data',action='store_true',
+                              help=("Use data's test files, if any, instead of fetching full data. "
+                                    "If test file not in '.data_stubs', fall back to fetching full data."))
 
     if 'examples' in cmds:
         egd_parser = parser.add_parser('examples', help=inspect.getdoc(examples))
-        egd_parser.set_defaults(func=lambda args: examples(name, args.path, args.verbose, args.force))
+        egd_parser.set_defaults(func=lambda args: examples(name, args.path, args.verbose, args.use_test_data, args.force))
         egd_parser.add_argument('--path',type=str,help='location to place examples and data',default='%s-examples'%name)
         egd_parser.add_argument('-v', '--verbose', action='count', default=0)
-        egd_parser.add_argument('--force', action='store_true', help='if PATH already exists, force overwrite existing examples if older than source examples')
-        # TODO: support use-test-data, force-data
+        egd_parser.add_argument('--force', action='store_true',
+                                help=('if PATH already exists, force overwrite existing examples if older '
+                                      'than source examples. ALSO force any existing data files to be replaced'))
+        egd_parser.add_argument('--use-test-data',action='store_true',
+                                help=("Use data's test files, if any, instead of fetching full data. "
+                                      "If test file not in '.data_stubs', fall back to fetching full data."))
 
     if 'clean-data' in cmds:
-        d_parser = parser.add_parser('clean-data', help=inspect.getdoc(clean_data))
-        d_parser.set_defaults(func=lambda args: clean_data(name,args.path))
-        d_parser.add_argument('--path',type=str,help='where to clean data',default='%s-examples'%name)
+        cd_parser = parser.add_parser('clean-data', help=inspect.getdoc(clean_data))
+        cd_parser.set_defaults(func=lambda args: clean_data(name,args.path))
+        cd_parser.add_argument('--path',type=str,help='where to clean data',default='%s-examples'%name)
 
 def substitute_main(name,cmds=None,args=None):
     # can use if your module has no other commands
