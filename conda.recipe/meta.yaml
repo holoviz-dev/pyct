@@ -26,6 +26,10 @@ test:
   imports:
     - pyct
     - pyct.cmd
+  requires:
+    {% for dep in sdata['extras_require']['tests'] %}
+    - "{{ dep }}"
+    {% endfor %}
 
 about:
   home: {{ sdata['url'] }}
