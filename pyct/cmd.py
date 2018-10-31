@@ -35,8 +35,6 @@ def examples(name,path,verbose=False,use_test_data=False,force=False):
     """
     copy_examples(name, path, verbose, force)
     fetch_data(name,path,require_datasets=False,use_test_data=use_test_data,force=force)
-    if use_test_data:
-        clean_data(name,path)
 
 
 def copy_examples(name,path,verbose=False,force=False):
