@@ -1,5 +1,5 @@
 data:
-  - url: foo
-    title: 'Fake Data'
+  - url: this_should_never_be_used
+    title: 'Test Data'
     files:
-      - foo.csv
+      - test_data.csv
