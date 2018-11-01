@@ -72,7 +72,7 @@ def monkeypatch_find_examples(monkeypatch, tmp_module):
     """Monkeypatching find examples to use a tmp examples.
     """
     def _find_examples(name):
-        return (tmp_module / "examples")
+        return os.path.join(str(tmp_module), "examples")
     monkeypatch.setattr(pyct.cmd, '_find_examples', _find_examples)
 
 @pytest.fixture(scope='function')
@@ -227,4 +227,3 @@ def test_clean_data_when_no_stubs_dir_does_nothing(tmp_project_with_examples):
     data.write_text(REAL_FILE_CONTENT)
     clean_data(name="pyct", path=path)
     assert (project / "examples" / "data" / "test_data.csv").is_file()
-    assert False
