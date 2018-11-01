@@ -2,7 +2,7 @@ from pyct.cmd import fetch_data, clean_data, copy_examples, examples
 import pytest
 
 # Same as in pyct/examples/datasets.yml
-DATASETS_CONTENT = """
+DATASETS_CONTENT = u"""
 data:
   - url: this_should_never_be_used
     title: 'Test Data'
@@ -11,14 +11,14 @@ data:
 """
 
 # Same as in pyct/examples/data/.data_stubs/test_data.csv
-TEST_FILE_CONTENT = """
+TEST_FILE_CONTENT = u"""
 name,score,rank
 Alice,100.5,1
 Bob,50.3,2
 Charlie,25,3
 """
 
-REAL_FILE_CONTENT = """
+REAL_FILE_CONTENT = u"""
 name,score,rank
 Alice,100.5,1
 Bob,50.3,2
@@ -28,7 +28,7 @@ Eve,25,3
 Frank,75,9
 """
 
-FAKE_EXAMPLE_CONTENT = """
+FAKE_EXAMPLE_CONTENT = u"""
 import numpy as np
 
 a = np.arange(10)
