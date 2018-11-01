@@ -1,5 +1,0 @@
-data:
-  - url: this_should_never_be_used
-    title: 'Test Data'
-    files:
-      - test_data.csv
