@@ -1,5 +1,9 @@
-from pyct.cmd import fetch_data, clean_data, copy_examples, examples
+import os
 import pytest
+import pyct.cmd
+from pyct.cmd import fetch_data, clean_data, copy_examples, examples
+
+
 
 # Same as in pyct/examples/datasets.yml
 DATASETS_CONTENT = u"""
@@ -34,6 +38,13 @@ import numpy as np
 a = np.arange(10)
 """
 
+@pytest.fixture(autouse=True)
+def monkeypatch_find_examples(monkeypatch):
+    """Monkeypatching find examples to use the examples dir in this test dir.
+    """
+    def _find_examples(name):
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "examples")
+    monkeypatch.setattr(pyct.cmd, '_find_examples', _find_examples)
 
 @pytest.fixture(scope='function')
 def tmp_project(tmp_path):
