@@ -121,77 +121,70 @@ def test_copy_examples_using_force_with_prexisting_content_in_target(tmp_project
 
 def test_fetch_data_using_test_data_with_no_file_in_data_copies_from_stubs(tmp_project_with_test_file):
     project = tmp_project_with_test_file
-    name = 'pyct'
     path = str(project / "examples")
-    fetch_data(name=name, path=path, use_test_data=True)
+    fetch_data(name="pyct", path=path, use_test_data=True)
     assert (project / "examples" / "data" / "test_data.csv").is_file()
     assert (project / "examples" / "data" / "test_data.csv").read_text() == TEST_FILE_CONTENT
 
 def test_fetch_data_using_test_data_with_file_in_data_skips(tmp_project_with_test_file):
     project = tmp_project_with_test_file
-    name = 'pyct'
     path = str(project / "examples")
     data = project / "examples" / "data" / "test_data.csv"
     data.write_text(REAL_FILE_CONTENT)
-    fetch_data(name=name, path=path, use_test_data=True)
+    fetch_data(name="pyct", path=path, use_test_data=True)
     assert (project / "examples" / "data" / "test_data.csv").is_file()
     assert (project / "examples" / "data" / "test_data.csv").read_text() == REAL_FILE_CONTENT
 
 def test_fetch_data_using_test_data_and_force_with_file_in_data_over_writes(tmp_project_with_test_file):
     project = tmp_project_with_test_file
-    name = 'pyct'
     path = str(project / "examples")
     data = project / "examples" / "data" / "test_data.csv"
     data.write_text(REAL_FILE_CONTENT)
-    fetch_data(name=name, path=path, use_test_data=True, force=True)
+    fetch_data(name="pyct", path=path, use_test_data=True, force=True)
     assert (project / "examples" / "data" / "test_data.csv").is_file()
     assert (project / "examples" / "data" / "test_data.csv").read_text() == TEST_FILE_CONTENT
 
 def test_clean_data_when_data_file_is_real_does_nothing(tmp_project_with_test_file):
     project = tmp_project_with_test_file
-    name = 'pyct'
     path = str(project / "examples")
     data = project / "examples" / "data" / "test_data.csv"
     data.write_text(REAL_FILE_CONTENT)
-    clean_data(name=name, path=path)
+    clean_data(name="pyct", path=path)
     assert (project / "examples" / "data" / "test_data.csv").is_file()
     assert (project / "examples" / "data" / "test_data.csv").read_text() == REAL_FILE_CONTENT
 
 def test_clean_data_when_data_file_is_from_stubs_removes_file_from_data(tmp_project_with_test_file):
     project = tmp_project_with_test_file
-    name = 'pyct'
     path = str(project / "examples")
     data = project / "examples" / "data" / "test_data.csv"
     data.write_text(TEST_FILE_CONTENT)
-    clean_data(name=name, path=path)
+    clean_data(name="pyct", path=path)
     assert not (project / "examples" / "data" / "test_data.csv").is_file()
     assert (project / "examples" / "data" / ".data_stubs" / "test_data.csv").is_file()
     assert (project / "examples" / "data" / ".data_stubs" / "test_data.csv").read_text() == TEST_FILE_CONTENT
 
 def test_clean_data_when_file_not_in_data_does_nothing(tmp_project_with_test_file):
     project = tmp_project_with_test_file
-    name = 'pyct'
     path = str(project / "examples")
-    clean_data(name=name, path=path)
+    clean_data(name="pyct", path=path)
     assert not (project / "examples" / "data" / "test_data.csv").is_file()
     assert (project / "examples" / "data" / ".data_stubs" / "test_data.csv").is_file()
     assert (project / "examples" / "data" / ".data_stubs" / "test_data.csv").read_text() == TEST_FILE_CONTENT
 
 def test_clean_data_when_stubs_is_empty_does_nothing(tmp_project_with_stubs):
     project = tmp_project_with_stubs
-    name = 'pyct'
     path = str(project / "examples")
     data = project / "examples" / "data" / "test_data.csv"
     data.write_text(REAL_FILE_CONTENT)
-    clean_data(name=name, path=path)
+    clean_data(name="pyct", path=path)
     assert (project / "examples" / "data" / "test_data.csv").is_file()
     assert not (project / "examples" / "data" / ".data_stubs" / "test_data.csv").is_file()
 
 def test_clean_data_when_no_stubs_dir_does_nothing(tmp_project_with_examples):
     project = tmp_project_with_examples
-    name = 'pyct'
     path = str(project / "examples")
     data = project / "examples" / "data" / "test_data.csv"
     data.write_text(REAL_FILE_CONTENT)
-    clean_data(name=name, path=path)
+    clean_data(name="pyct", path=path)
     assert (project / "examples" / "data" / "test_data.csv").is_file()
+    assert False
