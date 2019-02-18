@@ -7,7 +7,7 @@ DESCRIPTION = 'Python package common tasks for users (e.g. copy examples, fetch 
 
 setup_args = dict(
     name=NAME,
-    version=param.version.get_setup_version(os.path.dirname(__file__), NAME),
+    version=param.version.get_setup_version(__file__, NAME),
     description=DESCRIPTION,
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
