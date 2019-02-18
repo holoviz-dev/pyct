@@ -10,7 +10,6 @@ import inspect
 import argparse
 import distutils.dir_util
 import shutil
-from functools import partial
 
 def _find_examples(name):
     module_path = os.path.dirname(inspect.getfile(importlib.import_module(name)))
