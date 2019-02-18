@@ -381,12 +381,11 @@ def clean_data(name, path):
                       "size of data file {:.2e}".format(test_s, data_s))
 
 def _add_common_args(parser, name, *args):
-    common = {
-        '-v': dict('--verbose', action='count', default=0),
-        '--path': dict(type=str, help='where to place output', default='{}-examples'.format(name))
-        }
-    for arg in args:
-        parser.add_argument(arg, **common[arg])
+    if '-v' in args:
+        parser.add_argument('-v', '--verbose', action='count', default=0)
+    if '--path' in args:
+        parser.add_argument('--path',type=str, help='where to place output', default='{}-examples'.format(name))
+
 
 def _set_defaults(parser, name, fn):
     parser.set_defaults(func=lambda args: fn(name, **{k: getattr(args,k) for k in vars(args) if k!='func'} ))
