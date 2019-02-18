@@ -10,6 +10,7 @@ import inspect
 import argparse
 import distutils.dir_util
 import shutil
+from functools import partial
 
 def _find_examples(name):
     module_path = os.path.dirname(inspect.getfile(importlib.import_module(name)))
@@ -380,67 +381,75 @@ def clean_data(name, path):
                 print("Size of test file {:.2e} did not match "
                       "size of data file {:.2e}".format(test_s, data_s))
 
+def _add_common_args(parser, name, *args):
+    common = {
+        '-v': dict('--verbose', action='count', default=0),
+        '--path': dict(type=str, help='where to place output', default='{}-examples'.format(name))
+        }
+    for arg in args:
+        parser.add_argument(arg, **common[arg])
+
+def _set_defaults(parser, name, fn):
+    parser.set_defaults(func=lambda args: fn(name, **{k: getattr(args,k) for k in vars(args) if k!='func'} ))
 
 # TODO: cmds=None defaults to 'all', basically, which is a bit confusing
-
-# the alternative is a plugin system?
-def add_commands(parser,name,cmds=None,args=None):
-    # use to add commands to existing parser (see substitute_main for alternative)
-
-    # TODO: should be cleaned up
-
+def add_commands(parser, name, cmds=None, args=None):
+    """
+    Add all commands in pyct.cmd unless specific cmds are listed
+    """
     if cmds is None:
-        # again a reg (duplicated in substitute_main)
         cmds = ['examples','copy-examples','fetch-data','clean-data']
 
     # use dict/reg instead
     if 'copy-examples' in cmds:
         eg_parser = parser.add_parser('copy-examples', help=inspect.getdoc(copy_examples))
-        eg_parser.set_defaults(func=lambda args: copy_examples(name, args.path, args.verbose, args.force))
-        eg_parser.add_argument('--path',type=str,help='where to copy examples',default='%s-examples'%name)
-        eg_parser.add_argument('-v', '--verbose', action='count', default=0)
-        eg_parser.add_argument('--force', action='store_true', help='if PATH already exists, force overwrite existing files if older than source files')
+        eg_parser.add_argument('--force', action='store_true',
+                               help=('if PATH already exists, force overwrite existing '
+                                     'files if older than source files'))
+        _add_common_args(eg_parser, name, '-v', '--path')
+        _set_defaults(eg_parser, name, copy_examples)
 
     if 'fetch-data' in cmds:
         d_parser = parser.add_parser('fetch-data', help=inspect.getdoc(fetch_data))
-        d_parser.set_defaults(func=lambda args: fetch_data(name,args.path,args.datasets,use_test_data=args.use_test_data,force=args.force))
-        d_parser.add_argument('--path',type=str,help='where to put data',default='%s-examples'%name)
-        d_parser.add_argument('--datasets',type=str,help='*name* of datasets file; must exist either in path specified by --path or in package/examples/',default='datasets.yml')
-        d_parser.add_argument('-v', '--verbose', action='count', default=0)
-        d_parser.add_argument('--force',action='store_true', help='Force any existing data files to be replaced')
-        d_parser.add_argument('--use-test-data',action='store_true',
+        d_parser.add_argument('--datasets', type=str, default='datasets.yml',
+                              help=('*name* of datasets file; must exist either in path '
+                                    'specified by --path or in package/examples/'))
+        d_parser.add_argument('--force', action='store_true', help='Force any existing data files to be replaced')
+        d_parser.add_argument('--use-test-data', action='store_true',
                               help=("Use data's test files, if any, instead of fetching full data. "
                                     "If test file not in '.data_stubs', fall back to fetching full data."))
+        _add_common_args(d_parser, name, '-v', '--path')
+        _set_defaults(d_parser, name, fetch_data)
 
     if 'examples' in cmds:
         egd_parser = parser.add_parser('examples', help=inspect.getdoc(examples))
-        egd_parser.set_defaults(func=lambda args: examples(name, args.path, args.verbose, args.use_test_data, args.force))
-        egd_parser.add_argument('--path',type=str,help='location to place examples and data',default='%s-examples'%name)
-        egd_parser.add_argument('-v', '--verbose', action='count', default=0)
         egd_parser.add_argument('--force', action='store_true',
                                 help=('if PATH already exists, force overwrite existing examples if older '
                                       'than source examples. ALSO force any existing data files to be replaced'))
-        egd_parser.add_argument('--use-test-data',action='store_true',
+        egd_parser.add_argument('--use-test-data', action='store_true',
                                 help=("Use data's test files, if any, instead of fetching full data. "
                                       "If test file not in '.data_stubs', fall back to fetching full data."))
+        _add_common_args(egd_parser, name, '-v', '--path')
+        _set_defaults(egd_parser, name, examples)
 
     if 'clean-data' in cmds:
         cd_parser = parser.add_parser('clean-data', help=inspect.getdoc(clean_data))
-        cd_parser.set_defaults(func=lambda args: clean_data(name,args.path))
-        cd_parser.add_argument('--path',type=str,help='where to clean data',default='%s-examples'%name)
+        _add_common_args(cd_parser, name, '--path')
+        _set_defaults(cd_parser, name, clean_data)
 
-def substitute_main(name,cmds=None,args=None):
-    # can use if your module has no other commands
-
-    if cmds is None:
-        # again a reg
-        cmds = ['examples','copy-examples','fetch-data', 'clean-data']
-
+def add_version(parser, name):
     mod = importlib.import_module(name)
+    parser.add_argument('--version', action='version', version='%(prog)s ' + mod.__version__)
+
+def substitute_main(name, cmds=None, args=None):
+    """
+    If module has no other commands, use this function to add all of the ones in pyct.cmd
+    """
     parser = argparse.ArgumentParser(description="%s commands"%name)
-    parser.add_argument('--version', action='version', version='%(prog)s '+mod.__version__)
     subparsers = parser.add_subparsers(title='available commands')
-    add_commands(subparsers,name,cmds,args)
+    add_commands(subparsers, name, cmds, args)
+    add_version(parser, name)
+
     args = parser.parse_args()
     args.func(args) if hasattr(args,'func') else parser.error("must supply command to run")
 
