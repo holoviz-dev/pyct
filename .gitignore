@@ -1,5 +1,14 @@
-pvutil/.version
 *~
 *.pyc
 /dist
 *.egg-info
+pip-wheel-metadata
+.pytest_cache
+*__pycache__
+
+# pyct
+.doit.db
+.tox
+
+# autover
+*/.version

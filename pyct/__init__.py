@@ -1,3 +1,7 @@
-from param.version import Version
-__version__ = str(Version(fpath=__file__,archive_commit="$Format:%h$",reponame="pyct"))
-del Version
+import param
+
+NAME = "pyct"
+
+# version comes from git if available, otherwise from .version file
+__version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
+                                        reponame=NAME))
