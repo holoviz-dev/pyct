@@ -142,3 +142,7 @@ copying an examples folder into the package directory whenever
 setup.py is run. The way this works is likely to change in the near
 future, but is provided here as the first step towards
 unifying/simplifying the maintenance of a number of pyviz projects.
+
+## pyct.report
+
+Provides a way to check the package versions in an environment. It is currently set up as a console script, once pyct is installed it can be run with the command `report [packages]`. You can pass it the name of a Python package, `python`, or `conda`, as well as `system` to return the OS version.
