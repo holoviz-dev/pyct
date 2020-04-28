@@ -7,7 +7,7 @@
 from __future__ import print_function
 import os.path, importlib, subprocess, platform, sys
 
-def autover(*packages):
+def report(*packages):
     """Import and print location and version information for specified Python packages"""
     accepted_commands = ['python','conda']
     for package in packages:
@@ -54,7 +54,7 @@ def autover(*packages):
 
 
 def main():
-    autover(*(sys.argv[1:]))
+    report(*(sys.argv[1:]))
     
 if __name__ == "__main__":
     main()
