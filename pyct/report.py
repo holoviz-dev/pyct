@@ -47,8 +47,8 @@ def report(*packages):
                     pass
             elif package == 'system':
                 try:
-                    ver = platform.platform()
-                    loc = 'OS'
+                    ver = platform.platform(terse=True)
+                    loc = "OS: " + platform.platform()
                 except Exception:
                     pass
             else:
