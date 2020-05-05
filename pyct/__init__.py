@@ -1,4 +1,5 @@
 import param
+from .report import report
 
 NAME = "pyct"
 
