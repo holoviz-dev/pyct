@@ -82,7 +82,7 @@ setup_args = dict(
     },
     entry_points = {
         'console_scripts': [
-            'report = pyct.report:main',
+            'pyct=pyct.cmd:main',
         ],
     }
 )

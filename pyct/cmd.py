@@ -3,6 +3,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, absolute_import, division
+from . import __version__
+from .report import report
 
 import os
 import importlib
@@ -77,6 +79,7 @@ import time
 import zipfile
 
 import yaml
+
 try:
     import requests
 except ImportError:
@@ -451,3 +454,20 @@ def substitute_main(name, cmds=None, args=None):
     args = parser.parse_args()
     args.func(args) if hasattr(args,'func') else parser.error("must supply command to run")
 
+def main():
+    parser = argparse.ArgumentParser(description="Commands relating to versioning")
+    parser.add_argument('--version', action='version', version='%(prog)s '+__version__)
+
+    subparsers = parser.add_subparsers(title='available commands')
+
+    report_parser = subparsers.add_parser('report', help=inspect.getdoc(report))
+    report_parser.set_defaults(func=report)
+    report_parser.add_argument('packages',metavar='package',type=str,nargs='+',
+                               help='name of package')
+
+    args = parser.parse_args()
+
+    if hasattr(args,'func'):
+        args.func(*args.packages)
+    else:
+        parser.error("must supply command to run")

@@ -27,7 +27,11 @@ def report(*packages):
             if package in accepted_commands:
                 try:
                     # See if there is a command by that name and check its --version if so
-                    loc = subprocess.check_output(['which', package]).decode().strip()
+                    try:
+                        loc = subprocess.check_output(['which','-a',      package]).decode().splitlines()[0].strip()
+                    except:
+                        # .exe in case powershell (otherwise wouldn't need it)
+                        loc = subprocess.check_output(['where.exe',       package]).decode().splitlines()[0].strip()                    
                     out = ""
                     try:
                         out = subprocess.check_output([package, '--version'], stderr=subprocess.STDOUT)
