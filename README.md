@@ -143,6 +143,6 @@ setup.py is run. The way this works is likely to change in the near
 future, but is provided here as the first step towards
 unifying/simplifying the maintenance of a number of pyviz projects.
 
-## pyct.report
+## pyct report
 
-Provides a way to check the package versions in an environment. It is currently set up as a console script, once pyct is installed it can be run with the command `report [packages]`. You can pass it the name of a Python package, `python`, or `conda`, as well as `system` to return the OS version.
+Provides a way to check the package versions in the current environment using a console script (entry point). Once pyct is installed, you can run `pyct report [packages]`. The packages can include the name of any Python package (returning the `__version__`), along with the special cases `python`, `conda`, or `pip` (returning the version of the command-line tool) or `system` (returning the OS version).
