@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # Import and print the library version and filesystem location for each Python package or shell command specified
 #
-# bash usage: $ autover numpy pandas python conda
-# python usage: >>> import autover ; autover("numpy","pandas","python","conda")
+# bash usage: $ report numpy pandas python conda
+# python usage: >>> from report import report; report("numpy","pandas","python","conda")
 
 from __future__ import print_function
 import os.path, importlib, subprocess, platform, sys
@@ -47,8 +47,8 @@ def report(*packages):
                     pass
             elif package == 'system':
                 try:
-                    ver = platform.platform()
-                    loc = 'OS'
+                    ver = platform.platform(terse=True)
+                    loc = "OS: " + platform.platform()
                 except Exception:
                     pass
             else:
