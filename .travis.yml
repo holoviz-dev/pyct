@@ -7,12 +7,12 @@ language: generic
 
 env:
   global:
-    - PYENV_VERSION=3.6
+    - PYENV_VERSION=3.7
     - CHANS_DEV="-c pyviz/label/dev"
     - CHANS_REL="-c pyviz"
     - LABELS_DEV="--label=dev"
     - LABELS_REL="--label=dev --label=main"
-    - PKG_TEST_PYTHON="--test-python=py36 --test-python=py27"
+    - PKG_TEST_PYTHON="--test-python=py37 --test-python=py27"
 
 stages:
   - test
@@ -43,7 +43,6 @@ jobs:
     stage: pip_dev_package
     env: PP=testpypi PPU=$TPYPIU PPP=$TPYPIP
     install:
-      - unset PYENV_VERSION && pyenv global 3.6 2.7
       - doit package_build --test-group=build_examples $PKG_TEST_PYTHON --sdist-install-build-deps --sdist-run-tests
       - doit package_build --test-group=cmd_examples $PKG_TEST_PYTHON --sdist-install-build-deps --sdist-run-tests
     script: doit package_upload -u $PPU -p $PPP --pypi $PP
