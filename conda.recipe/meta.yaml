@@ -33,10 +33,10 @@ test:
     - nose
   commands:
     - nosetests -vv --nologcapture
-    - autover --help
-    - autover --version
-    - autover report --help	   
-    - autover report autover python which
+    - pyct --help
+    - pyct --version
+    - pyct report --help	   
+    - pyct report pyct python which
 
 about:
   home: {{ sdata['url'] }}
