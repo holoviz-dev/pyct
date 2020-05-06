@@ -30,6 +30,13 @@ test:
     {% for dep in sdata['extras_require']['tests'] %}
     - "{{ dep }}"
     {% endfor %}
+    - nose
+  commands:
+    - nosetests -vv --nologcapture
+    - autover --help
+    - autover --version
+    - autover report --help	   
+    - autover report autover python which
 
 about:
   home: {{ sdata['url'] }}
