@@ -30,13 +30,13 @@ test:
     {% for dep in sdata['extras_require']['tests'] %}
     - "{{ dep }}"
     {% endfor %}
-    - nose
-  commands:
-    - nosetests -vv --nologcapture
-    - pyct --help
-    - pyct --version
-    - pyct report --help	   
-    - pyct report pyct python which
+  #   - nose
+  # commands:
+  #   - nosetests -vv --nologcapture
+  #   - pyct --help
+  #   - pyct --version
+  #   - pyct report --help	   
+  #   - pyct report pyct python which
 
 about:
   home: {{ sdata['url'] }}
