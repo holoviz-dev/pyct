@@ -43,7 +43,7 @@ def report(*packages):
                         if '.' in s and str.isdigit(s[0]) and sum(str.isdigit(c) for c in s)>=2:
                             ver=s.strip()
                             break
-                except Exception as e:
+                except:
                     pass
             elif package == 'system':
                 try:
