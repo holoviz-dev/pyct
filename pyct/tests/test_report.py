@@ -37,11 +37,11 @@ def test_report_gives_python_version(mock_check_output, mock_print):
 @patch("builtins.print")
 @patch("platform.platform")
 def test_report_gives_system_version(mock_platform, mock_print):
-    mock_platform.return_value = "Darwin-19.2.0-x86_64-i386-64bit"
+    mock_platform.side_effect = ["Darwin-19.2.0", "Darwin-19.2.0-x86_64-i386-64bit"]
 
     report("system")
 
-    mock_print.assert_called_with("system=Darwin-19.2.0-x86_64-i386-64bit # OS")
+    mock_print.assert_called_with("system=Darwin-19.2.0           # OS: Darwin-19.2.0-x86_64-i386-64bit")
 
 @patch("builtins.print")
 def test_unknown_package_output(mock_print):
