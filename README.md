@@ -151,4 +151,4 @@ Provides a way to check the package versions in the current environment using:
   
 The python function can be particularly useful for e.g. jupyter notebook users, since it is the packages in the current kernel that we usually care about (not those in the environment from which jupyter notebook server/lab was launched).
   
-Note that `packages` above can include the name of any Python package (returning the `__version__`), along with the special cases `python`, `conda`, or `pip` (returning the version of the command-line tool) or `system` (returning the OS version).
+Note that `packages` above can include the name of any Python package (returning the `__version__`), along with the special cases `python` or `conda` (returning the version of the command-line tool) or `system` (returning the OS version).
