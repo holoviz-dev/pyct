@@ -32,7 +32,7 @@ test:
     {% endfor %}
     - nose
   commands:
-    - nosetests -vv --nologcapture
+    - pytest pyct
     - pyct --help
     - pyct --version
     - pyct report --help	   
