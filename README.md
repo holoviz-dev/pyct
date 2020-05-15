@@ -145,4 +145,10 @@ unifying/simplifying the maintenance of a number of pyviz projects.
 
 ## pyct report
 
-Provides a way to check the package versions in the current environment using a console script (entry point). Once pyct is installed, you can run `pyct report [packages]`. The packages can include the name of any Python package (returning the `__version__`), along with the special cases `python` or `conda` (returning the version of the command-line tool) or `system` (returning the OS version).
+Provides a way to check the package versions in the current environment using:
+  1. A console script (entry point): `pyct report [packages]`, or
+  2. A python function: `import pyct; pyct.report(packages)`
+
+The python function can be particularly useful for e.g. jupyter notebook users, since it is the packages in the current kernel that we usually care about (not those in the environment from which jupyter notebook server/lab was launched).
+
+Note that `packages` above can include the name of any Python package (returning the `__version__`), along with the special cases `python` or `conda` (returning the version of the command-line tool) or `system` (returning the OS version).
