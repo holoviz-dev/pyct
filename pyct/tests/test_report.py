@@ -3,7 +3,7 @@ from pyct.report import report
 
 class TestModule:
     __version__ = "1.9.3"
-    __file__ = "/Users/kbowen/opt/anaconda3/envs/pyct/lib/python3.7/site-packages/param/__init__.py"
+    __file__ = "/mock/opt/anaconda3/envs/pyct/lib/python3.7/site-packages/param/__init__.py"
 
 @patch("builtins.print")
 @patch("importlib.import_module")
@@ -13,26 +13,26 @@ def test_report_gives_package_version(mock_import_module, mock_print):
     
     report("param")
     
-    mock_print.assert_called_with('param=1.9.3                    # /Users/kbowen/opt/anaconda3/envs/pyct/lib/python3.7/site-packages/param')
+    mock_print.assert_called_with('param=1.9.3                    # /mock/opt/anaconda3/envs/pyct/lib/python3.7/site-packages/param')
 
 @patch("builtins.print")
 @patch("subprocess.check_output")
 def test_report_gives_conda_version(mock_check_output, mock_print):
-    mock_check_output.side_effect = [b'/Users/kbowen/opt/anaconda3/condabin/conda\n', b'conda 4.8.3\n']
+    mock_check_output.side_effect = [b'/mock/opt/anaconda3/condabin/conda\n', b'conda 4.8.3\n']
 
     report("conda")
 
-    mock_print.assert_called_with("conda=4.8.3                    # /Users/kbowen/opt/anaconda3/condabin/conda")
+    mock_print.assert_called_with("conda=4.8.3                    # /mock/opt/anaconda3/condabin/conda")
     
 
 @patch("builtins.print")
 @patch("subprocess.check_output")
 def test_report_gives_python_version(mock_check_output, mock_print):
-    mock_check_output.side_effect = [b'/Users/kbowen/opt/anaconda3/envs/pyct/bin/python\n', b'Python 3.7.7\n']
+    mock_check_output.side_effect = [b'/mock/opt/anaconda3/envs/pyct/bin/python\n', b'Python 3.7.7\n']
 
     report("python")
 
-    mock_print.assert_called_with("python=3.7.7                   # /Users/kbowen/opt/anaconda3/envs/pyct/bin/python")
+    mock_print.assert_called_with("python=3.7.7                   # /mock/opt/anaconda3/envs/pyct/bin/python")
 
 @patch("builtins.print")
 @patch("platform.platform")
