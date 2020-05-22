@@ -35,7 +35,7 @@ test:
     - pyct --help
     - pyct --version
     - pyct report --help	   
-    - pyct report pyct python which
+    - pyct report pyct python
 
 about:
   home: {{ sdata['url'] }}
