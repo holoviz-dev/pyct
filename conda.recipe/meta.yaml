@@ -30,7 +30,6 @@ test:
     {% for dep in sdata['extras_require']['tests'] %}
     - "{{ dep }}"
     {% endfor %}
-    - nose
   commands:
     - pytest pyct
     - pyct --help
