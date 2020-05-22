@@ -79,6 +79,11 @@ setup_args = dict(
             "setuptools",
             "param >=1.7.0",
         ]
+    },
+    entry_points = {
+        'console_scripts': [
+            'pyct=pyct.cmd:main',
+        ],
     }
 )
 
