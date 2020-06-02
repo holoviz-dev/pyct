@@ -37,7 +37,7 @@ test:
     - "{{ dep }}"
     {% endfor %}
   commands:
-    - pytest pyct
+    - pytest -v --pyargs pyct
     - pyct --help
     - pyct --version
     - pyct report --help	   
