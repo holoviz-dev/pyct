@@ -9,6 +9,12 @@ source:
 
 build:
   noarch: python
+  entry_points:
+    {% for group,epoints in sdata.get("entry_points",{}).items() %}
+    {% for entry_point in epoints %}
+    - {{ entry_point }}
+    {% endfor %}
+    {% endfor %}
 
 requirements:
   host:
