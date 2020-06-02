@@ -36,12 +36,6 @@ test:
     {% for dep in sdata['extras_require']['tests'] %}
     - "{{ dep }}"
     {% endfor %}
-  commands:
-    - pytest pyct
-    - pyct --help
-    - pyct --version
-    - pyct report --help	   
-    - pyct report pyct python
 
 about:
   home: {{ sdata['url'] }}
