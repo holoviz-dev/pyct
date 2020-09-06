@@ -419,7 +419,7 @@ def add_commands(parser, name, cmds=None, args=None):
         d_parser.add_argument('--use-test-data', action='store_true',
                               help=("Use data's test files, if any, instead of fetching full data. "
                                     "If test file not in '.data_stubs', fall back to fetching full data."))
-        _add_common_args(d_parser, name, '-v', '--path')
+        _add_common_args(d_parser, name, '--path')
         _set_defaults(d_parser, name, fetch_data)
 
     if 'examples' in cmds:
