@@ -1,5 +1,7 @@
-sudo: false
-language: generic
+language: python
+
+python:
+  - "3.7"
 
 # quick hack to determine what tag is (improvements welcomed)
 #     release: ^v(\d+|\.)*[^a-z]\d*$
@@ -7,7 +9,6 @@ language: generic
 
 env:
   global:
-    - PYENV_VERSION=3.7
     - CHANS_DEV="-c pyviz/label/dev"
     - CHANS_REL="-c pyviz"
     - LABELS_DEV="--label=dev"
