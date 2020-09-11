@@ -81,7 +81,7 @@ setup_args = dict(
     },
     entry_points = {
         'console_scripts': [
-            'pyct=pyct.cmd:main',
+            'pyct=pyct.__main__:main',
         ],
     }
 )
