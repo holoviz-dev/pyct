@@ -47,9 +47,9 @@ setup_args = dict(
         'Development Status :: 4 - Beta'
     ],
     author='HoloViz',
-    author_email='holoviews@gmail.com',
+    author_email='developers@holoviz.org',
     maintainer='HoloViz',
-    maintainer_email='holoviews@gmail.com',
+    maintainer_email='developers@holoviz.org',
     url='https://github.com/pyviz-dev/{}'.format(NAME),
     project_urls = {
         'Bug Tracker': 'https://github.com/pyviz-dev/{}/issues'.format(NAME),
