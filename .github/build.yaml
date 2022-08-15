@@ -1,0 +1,101 @@
+name: packages
+on:
+  push:
+    tags:
+    - 'v[0-9]+.[0-9]+.[0-9]+'
+    - 'v[0-9]+.[0-9]+.[0-9]+a[0-9]+'
+    - 'v[0-9]+.[0-9]+.[0-9]+b[0-9]+'
+    - 'v[0-9]+.[0-9]+.[0-9]+rc[0-9]+'
+  # Dry-run only
+  workflow_dispatch:
+  schedule:
+    - cron: '0 19 * * SUN'
+
+jobs:
+  conda_build:
+    name: Build Conda Packages
+    runs-on: 'ubuntu-latest'
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      CHANS: "-c pyviz"
+      PKG_TEST_PYTHON: "--test-python=py37"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "100"
+      - name: Fetch unshallow
+        run: git fetch --prune --tags --unshallow -f
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          python-version: 3.7
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: conda setup
+        run: |
+          conda install -c pyviz "pyctdev>=0.5"
+          doit ecosystem_setup
+      - name: conda build
+        run: |
+          doit package_build --recipe=core $PKG_TEST_PYTHON --test-group=build_examples $CHANS
+          doit package_build               $PKG_TEST_PYTHON --test-group=cmd_examples   $CHANS
+      - name: dev deploy
+        if: (github.event_name == 'push' && (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+        run: |
+          doit package_upload --token=${{ secrets.CONDA_UPLOAD_TOKEN }} --label=dev --recipe=core
+          doit package_upload --token=${{ secrets.CONDA_UPLOAD_TOKEN }} --label=dev
+      - name: main deploy
+        if: (github.event_name == 'push' && !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+        run: |
+          doit package_upload --token=${{ secrets.CONDA_UPLOAD_TOKEN }} --label=dev --label=main --recipe=core
+          doit package_upload --token=${{ secrets.CONDA_UPLOAD_TOKEN }} --label=dev --label=main
+  pip_build:
+    name: Build PyPI Packages
+    runs-on: 'ubuntu-latest'
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      CHANS: "-c pyviz"
+      PKG_TEST_PYTHON: "--test-python=py37"
+      PYTHON_VERSION: "3.7"
+      PYPI: "https://upload.pypi.org/legacy/"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "100"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+      - name: Fetch unshallow
+        run: git fetch --prune --tags --unshallow -f
+      - name: conda setup
+        run: |
+          conda install -c pyviz "pyctdev>=0.5"
+          doit ecosystem_setup
+          doit env_create $CHANS --python=$PYTHON_VERSION
+      - name: env setup
+        run: |
+          conda activate test-environment
+          doit develop_install $CHANS -o build
+          doit pip_on_conda
+      - name: pip build
+        run: |
+          conda activate test-environment
+          doit package_build --test-group=build_examples $PKG_TEST_PYTHON --sdist-install-build-deps --sdist-run-tests
+          doit package_build --test-group=cmd_examples $PKG_TEST_PYTHON --sdist-install-build-deps --sdist-run-tests
+      - name: git status
+        run: |
+          git status
+          git diff
+      - name: pip upload
+        if: github.event_name == 'push'
+        run: |
+          conda activate test-environment
+          doit ecosystem=pip package_upload -u ${{ secrets.PPU }} -p ${{ secrets.PPP }} -r $PYPI
