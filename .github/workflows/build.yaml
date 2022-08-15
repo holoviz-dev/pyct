@@ -21,6 +21,7 @@ jobs:
     env:
       CHANS: "-c pyviz"
       PKG_TEST_PYTHON: "--test-python=py37"
+      PYCTDEV_ECOSYSTEM: conda
     steps:
       - uses: actions/checkout@v3
         with:
@@ -63,6 +64,7 @@ jobs:
       PKG_TEST_PYTHON: "--test-python=py37"
       PYTHON_VERSION: "3.7"
       PYPI: "https://upload.pypi.org/legacy/"
+      PYCTDEV_ECOSYSTEM: conda
     steps:
       - uses: actions/checkout@v3
         with:
@@ -88,8 +90,8 @@ jobs:
       - name: pip build
         run: |
           conda activate test-environment
-          doit package_build --test-group=build_examples $PKG_TEST_PYTHON --sdist-install-build-deps --sdist-run-tests
-          doit package_build --test-group=cmd_examples $PKG_TEST_PYTHON --sdist-install-build-deps --sdist-run-tests
+          doit ecosystem=pip package_build --test-group=build_examples $PKG_TEST_PYTHON --sdist-install-build-deps --sdist-run-tests
+          doit ecosystem=pip package_build --test-group=cmd_examples $PKG_TEST_PYTHON --sdist-install-build-deps --sdist-run-tests
       - name: git status
         run: |
           git status
