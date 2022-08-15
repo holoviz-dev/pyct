@@ -5,6 +5,8 @@
 pip-wheel-metadata
 .pytest_cache
 *__pycache__
+.venv
+venv/
 
 # pyct
 .doit.db
