@@ -37,7 +37,7 @@ setup_args = dict(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     license='BSD 3-Clause License',
-    license_file='LICENSE.txt',
+    license_files=['LICENSE.txt'],
     classifiers = [
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
