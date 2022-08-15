@@ -35,8 +35,8 @@ jobs:
           fetch-depth: "1"
       - name: setup pyctdev
         run: |
-          python3 -m pip install --upgrade setuptools pip wheel
-          python3 -m pip install pyctdev
+          pip install --upgrade setuptools pip wheel
+          pip install pyctdev
       - name: install test deps
         run: doit develop_install -o cmd -o tests
       - name: doit test_flakes
