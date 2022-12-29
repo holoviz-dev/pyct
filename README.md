@@ -20,7 +20,7 @@ To install pyct with the dependencies required for pyct.cmd: `pip
 install pyct[cmd]` or `conda install -c pyviz pyct`.
 
 An example of how to use in a project:
-https://github.com/ioam/geoviews/blob/master/geoviews/__main__.py
+https://github.com/holoviz/geoviews/blob/main/geoviews/__main__.py
 
 Once added, users can copy the examples of a package and download the
 required data with the `examples` command:
