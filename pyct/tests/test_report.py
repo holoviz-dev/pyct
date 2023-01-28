@@ -5,9 +5,9 @@ class TestModule:
     __version__ = "1.9.3"
     __file__ = "/mock/opt/anaconda3/envs/pyct/lib/python3.7/site-packages/param/__init__.py"
 
-@patch("builtins.print")
 @patch("importlib.import_module")
-def test_report_gives_package_version(mock_import_module, mock_print):
+@patch("builtins.print")
+def test_report_gives_package_version(mock_print, mock_import_module):
     module = TestModule()
     mock_import_module.return_value = module
     
