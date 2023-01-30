@@ -24,7 +24,6 @@ jobs:
       run:
         shell: bash -l {0}
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SETUPTOOLS_ENABLE_FEATURES: "legacy-editable"
     steps:
       - uses: actions/checkout@v3
@@ -38,10 +37,10 @@ jobs:
           python -m pip install --upgrade setuptools pip wheel
           python -m pip install "tox<4" tox-gh-actions
       - name: flakes
-        run: tox -e _flakes
+        run: tox -e flakes
       - name: unit
-        run: tox -e _unit
+        run: tox -e unit
       - name: _cmd_examples
-        run: tox -e _cmd_examples
+        run: tox -e cmd_examples
       - name: _build_examples
-        run: tox -e _build_examples
+        run: tox -e build_examples
