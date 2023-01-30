@@ -23,8 +23,8 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-    env:
-      SETUPTOOLS_ENABLE_FEATURES: "legacy-editable"
+    # env:
+    #   SETUPTOOLS_ENABLE_FEATURES: "legacy-editable"
     steps:
       - uses: actions/checkout@v3
         with:
