@@ -34,8 +34,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: setup
         run: |
-          python -m pip install --upgrade setuptools pip wheel
-          python -m pip install "tox<4" tox-gh-actions
+          python3 -m pip install --upgrade setuptools pip wheel
+          python3 -m pip install "tox<4" tox-gh-actions
       - name: flakes
         run: tox -e flakes
       - name: unit
