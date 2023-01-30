@@ -29,21 +29,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: "1"
+          fetch-depth: "100"
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: setup pyctdev
+      - name: setup
         run: |
-          python3 -m pip install --upgrade setuptools pip wheel
-          python3 -m pip install pyctdev
+          python -m pip install --upgrade setuptools pip wheel
+          python -m pip install "tox<4" tox-gh-actions
       - name: install test deps
         run: doit develop_install -o cmd -o tests
-      - name: doit test_flakes
-        run: doit test_flakes
-      - name: doit test_unit
-        run: doit test_unit
-      - name: doit test_cmd_examples
-        run: doit test_cmd_examples
-      - name: doit test_build_examples
-        run: doit test_build_examples
+      - name: flakes
+        run: tox -e _flakes
+      - name: unit
+        run: tox -e _unit
+      - name: _cmd_examples
+        run: tox -e _cmd_examples
+      - name: _build_examples
+        run: tox -e _build_examples
