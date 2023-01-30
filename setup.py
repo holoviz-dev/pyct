@@ -61,7 +61,7 @@ setup_args = dict(
     },
     include_package_data=True,
     packages=find_packages(),
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     install_requires=[
         'param >=1.7.0',
     ],
