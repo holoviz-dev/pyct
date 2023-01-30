@@ -37,8 +37,6 @@ jobs:
         run: |
           python -m pip install --upgrade setuptools pip wheel
           python -m pip install "tox<4" tox-gh-actions
-      - name: install test deps
-        run: doit develop_install -o cmd -o tests
       - name: flakes
         run: tox -e _flakes
       - name: unit
