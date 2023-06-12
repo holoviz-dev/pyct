@@ -53,10 +53,10 @@ setup_args = dict(
     author_email='developers@holoviz.org',
     maintainer='HoloViz',
     maintainer_email='developers@holoviz.org',
-    url='https://github.com/pyviz-dev/{}'.format(NAME),
+    url='https://github.com/holoviz-dev/{}'.format(NAME),
     project_urls = {
-        'Bug Tracker': 'https://github.com/pyviz-dev/{}/issues'.format(NAME),
-        'Source Code': 'https://github.com/pyviz-dev/{}'.format(NAME),
+        'Bug Tracker': 'https://github.com/holoviz-dev/{}/issues'.format(NAME),
+        'Source Code': 'https://github.com/holoviz-dev/{}'.format(NAME),
     },
     include_package_data=True,
     packages=find_packages(),
