@@ -10,6 +10,7 @@ install = 'python -m pip install --no-deps --disable-pip-version-check -e .'
 PYTHONIOENCODING = "utf-8"
 
 [environments]
+test-38 = ["py38", "test", "test-cmd"]
 test-39 = ["py39", "test", "test-cmd"]
 test-310 = ["py310", "test", "test-cmd"]
 test-311 = ["py311", "test", "test-cmd"]
@@ -21,6 +22,9 @@ lint = ["py311", "lint"]
 [dependencies]
 nomkl = "*"
 pip = "*"
+
+[feature.py38.dependencies]
+python = "3.8.*"
 
 [feature.py39.dependencies]
 python = "3.9.*"
