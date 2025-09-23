@@ -10,7 +10,6 @@ import os
 import importlib
 import inspect
 import argparse
-import distutils.dir_util
 import shutil
 
 def _find_examples(name):
@@ -47,7 +46,7 @@ def copy_examples(name,path,verbose=False,force=False):
         raise ValueError("Path %s already exists; please move it away, choose a different path, or use force."%path)
     if verbose:
         print("Copying examples from %s"%source)
-    distutils.dir_util.copy_tree(source, path, verbose=verbose)
+    shutil.copytree(source, path, dirs_exist_ok=True)
     print("Copied examples to %s"%path)
 
 """
