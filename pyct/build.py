@@ -20,27 +20,3 @@ def examples(path, root, verbose=False, force=False):
         shutil.copytree(tree_root, path, ignore=ignore, symlinks=True)
     else:
         print('Cannot find %s' % tree_root)
-
-
-def get_setup_version(root, reponame):
-    """
-    Helper to get the current version from either git describe or the
-    .version file (if available) - allows for param to not be available.
-
-    Normally used in setup.py as follows:
-
-    >>> from pyct.build import get_setup_version
-    >>> version = get_setup_version(__file__, reponame)  # noqa
-    """
-    import json
-    filepath = os.path.abspath(os.path.dirname(root))
-    version_file_path = os.path.join(filepath, reponame, '.version')
-    try:
-        from param import version
-    except:
-        version = None
-    if version is not None:
-        return version.Version.setup_version(filepath, reponame, archive_commit="$Format:%h$")
-    else:
-        print("WARNING: param>=1.6.0 unavailable. If you are installing a package, this warning can safely be ignored. If you are creating a package or otherwise operating in a git repository, you should install param>=1.6.0.")
-        return json.load(open(version_file_path, 'r'))['version_string']

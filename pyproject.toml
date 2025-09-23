@@ -32,9 +32,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Development Status :: 4 - Beta"
 ]
-dependencies = [
-    "param>=1.7.0",
-]
+dependencies = []
 
 [project.optional-dependencies]
 cmd = ["pyyaml", "requests"]
