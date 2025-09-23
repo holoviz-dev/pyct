@@ -41,6 +41,9 @@ test:
     {% for dep in project['optional-dependencies']['tests'] %}
     - {{ dep }}
     {% endfor %}
+    {% for dep in project['optional-dependencies']['cmd'] %}
+    - {{ dep }}
+    {% endfor %}
   source_files:
     - pyproject.toml
   imports:
