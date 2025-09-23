@@ -16,3 +16,4 @@ venv/
 */.version
 
 build/
+pyct/_version.py

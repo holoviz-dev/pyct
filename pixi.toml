@@ -48,7 +48,7 @@ test-cmd-report-help = 'pyct report --help'
 test-cmd-report-pyct-python = 'pyct report pyct python'
 test-cmd-m-version = 'python -m pyct --version'
 test-cmd-examples = "python -c \"import pyct; pyct.report('pyct','python','system')\""
-test-build-examples = 'python -c \"from pyct.build import examples\"'
+test-build-examples = "python -c \"from pyct.build import examples\""
 
 [feature.test.dependencies]
 pytest = "*"
