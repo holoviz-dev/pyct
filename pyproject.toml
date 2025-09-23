@@ -36,7 +36,7 @@ dependencies = []
 
 [project.optional-dependencies]
 cmd = ["pyyaml", "requests"]
-tests = ["flake8", "pytest"]
+tests = ["pytest"]
 doc = ["nbsite", "sphinx_ioam_theme"]
 build = ["setuptools", "param>=1.7.0"]
 
@@ -60,3 +60,7 @@ include = ["pyct", "scripts"]
 
 [tool.hatch.build.hooks.vcs]
 version-file = "pyct/_version.py"
+
+[tool.pytest.ini_options]
+addopts = ["-v", "--pyargs"]
+norecursedirs = "doc .git dist build _build .ipynb_checkpoints apps"
