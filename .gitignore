@@ -17,3 +17,7 @@ venv/
 
 build/
 pyct/_version.py
+
+# pixi
+.pixi
+pixi.lock
