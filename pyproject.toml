@@ -1,6 +1,64 @@
 [build-system]
 requires = [
-    "param >=1.7.0",
-    "setuptools >=61.0"
+    "hatchling >=1.25.0",
+    "hatch-vcs >=0.4.0",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
+
+[project]
+name = "pyct"
+dynamic = ["version"]
+readme = "README.md"
+description = "Python package common tasks for users (e.g. copy examples, fetch data, ...)"
+license = "BSD-3-Clause"
+license-files = ["LICENSE.txt"]
+requires-python = ">=3.7"
+authors = [
+    {name = "HoloViz", email = "developers@holoviz.org"}
+]
+maintainers = [
+    {name = "HoloViz", email = "developers@holoviz.org"}
+]
+keywords = ["pyct", "examples", "data", "utilities"]
+classifiers = [
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Development Status :: 4 - Beta"
+]
+dependencies = [
+    "param>=1.7.0",
+]
+
+[project.optional-dependencies]
+cmd = ["pyyaml", "requests"]
+tests = ["flake8", "pytest"]
+doc = ["nbsite", "sphinx_ioam_theme"]
+build = ["setuptools", "param>=1.7.0"]
+
+[project.urls]
+Homepage = "https://github.com/holoviz-dev/pyct"
+Source = "https://github.com/holoviz-dev/pyct"
+BugTracker = "https://github.com/holoviz-dev/pyct/issues"
+
+[project.scripts]
+pyct = "pyct.__main__:main"
+
+[tool.hatch.version]
+source = "vcs"
+raw-options = { version_scheme = "no-guess-dev" }
+
+[tool.hatch.build.targets.wheel]
+include = ["pyct"]
+
+[tool.hatch.build.targets.sdist]
+include = ["pyct", "scripts"]
+
+[tool.hatch.build.hooks.vcs]
+version-file = "pyct/_version.py"
