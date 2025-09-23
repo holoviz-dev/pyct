@@ -5,7 +5,11 @@
 # python usage: >>> from report import report; report("numpy","pandas","python","conda")
 
 from __future__ import print_function
-import os.path, importlib, subprocess, platform, sys
+import os.path
+import importlib
+import subprocess
+import platform
+import sys
 
 def report(*packages):
     """Import and print location and version information for specified Python packages"""
@@ -22,16 +26,16 @@ def report(*packages):
                 ver = str(module.__version__)
             except Exception:
                 pass
-        
+
         except (ImportError, ModuleNotFoundError):
             if package in accepted_commands:
                 try:
                     # See if there is a command by that name and check its --version if so
                     try:
                         loc = subprocess.check_output('command -v {}'.format(package), shell=True).decode().splitlines()[0].strip()
-                    except:
+                    except Exception:
                         # .exe in case powershell (otherwise wouldn't need it)
-                        loc = subprocess.check_output( 'where.exe {}'.format(package), shell=True).decode().splitlines()[0].strip()                    
+                        loc = subprocess.check_output( 'where.exe {}'.format(package), shell=True).decode().splitlines()[0].strip()
                     out = ""
                     try:
                         out = subprocess.check_output([package, '--version'], stderr=subprocess.STDOUT)
@@ -43,7 +47,7 @@ def report(*packages):
                         if '.' in s and str.isdigit(s[0]) and sum(str.isdigit(c) for c in s)>=2:
                             ver=s.strip()
                             break
-                except:
+                except Exception:
                     pass
             elif package == 'system':
                 try:
@@ -53,13 +57,12 @@ def report(*packages):
                     pass
             else:
                 pass
-        
+
         print("{0:30} # {1}".format(package + "=" + ver,loc))
 
 
 def main():
     report(*(sys.argv[1:]))
-    
+
 if __name__ == "__main__":
     main()
-    

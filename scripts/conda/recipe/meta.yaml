@@ -49,7 +49,7 @@ test:
     - pytest -v --pyargs pyct
     - pyct --help
     - pyct --version
-    - pyct report --help	   
+    - pyct report --help
     - pyct report pyct python
 
 about:

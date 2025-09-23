@@ -70,17 +70,16 @@ clint.textui.progress
 This module provides the progressbar functionality.
 
 """
-from collections import OrderedDict
-import glob
-import sys
-import tarfile
-import time
-import zipfile
-
-import yaml
+from collections import OrderedDict  # noqa: E402
+import glob  # noqa: E402
+import sys  # noqa: E402
+import tarfile  # noqa: E402
+import time  # noqa: E402
+import zipfile  # noqa: E402
+import yaml  # noqa: E402
 
 try:
-    import requests
+    import requests  # noqa: E402
 except ImportError:
     requests = None
 

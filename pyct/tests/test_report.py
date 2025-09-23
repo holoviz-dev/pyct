@@ -10,9 +10,9 @@ class TestModule:
 def test_report_gives_package_version(mock_print, mock_import_module):
     module = TestModule()
     mock_import_module.return_value = module
-    
+
     report("param")
-    
+
     mock_print.assert_called_with('param=1.9.3                    # /mock/opt/anaconda3/envs/pyct/lib/python3.7/site-packages/param')
 
 @patch("builtins.print")
@@ -23,7 +23,7 @@ def test_report_gives_conda_version(mock_check_output, mock_print):
     report("conda")
 
     mock_print.assert_called_with("conda=4.8.3                    # /mock/opt/anaconda3/condabin/conda")
-    
+
 
 @patch("builtins.print")
 @patch("subprocess.check_output")
@@ -46,5 +46,5 @@ def test_report_gives_system_version(mock_platform, mock_print):
 @patch("builtins.print")
 def test_unknown_package_output(mock_print):
     report("fake_package")
-    
+
     mock_print.assert_called_with("fake_package=unknown           # not installed in this environment")
