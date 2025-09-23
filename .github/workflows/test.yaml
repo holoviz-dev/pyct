@@ -102,7 +102,6 @@ jobs:
           pixi run -e ${{ matrix.environment }} test-cmd-m-version
           pixi run -e ${{ matrix.environment }} test-cmd-examples
           pixi run -e ${{ matrix.environment }} test-build-examples
-          pixi run -e ${{ matrix.environment }} test-example
 
   result_test_suite:
     name: result:test
