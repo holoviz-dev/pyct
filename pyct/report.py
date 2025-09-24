@@ -4,7 +4,6 @@
 # bash usage: $ report numpy pandas python conda
 # python usage: >>> from report import report; report("numpy","pandas","python","conda")
 
-from __future__ import print_function
 import os.path
 import importlib
 import subprocess
