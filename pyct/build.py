@@ -1,5 +1,7 @@
 import os
 import shutil
+import warnings
+
 
 def examples(path, root, verbose=False, force=False):
     """
@@ -31,7 +33,14 @@ def get_setup_version(root, reponame):
 
     >>> from pyct.build import get_setup_version
     >>> version = get_setup_version(__file__, reponame)  # noqa
+
+    .. deprecated:: 0.6.0
     """
+    warnings.warn(
+        "get_setup_version is deprecated and will be removed in a future version.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     import json
     filepath = os.path.abspath(os.path.dirname(root))
     version_file_path = os.path.join(filepath, reponame, '.version')
