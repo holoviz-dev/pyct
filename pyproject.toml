@@ -38,8 +38,6 @@ dependencies = []
 [project.optional-dependencies]
 cmd = ["pyyaml", "requests"]
 tests = ["pytest"]
-doc = ["nbsite", "sphinx_ioam_theme"]
-build = ["setuptools", "param>=1.7.0"]
 
 [project.urls]
 Homepage = "https://github.com/holoviz-dev/pyct"
