@@ -1,9 +1,10 @@
-import param
+from .__version import __version__
+from .report import report  # noqa: api
 
 NAME = "pyct"
 
-from .report import report  # noqa: api
-
-# version comes from git if available, otherwise from .version file
-__version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
-                                        reponame=NAME))
+__all__ = [
+    "NAME",
+    "__version__",
+    "report",
+]

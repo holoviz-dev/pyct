@@ -16,3 +16,8 @@ venv/
 */.version
 
 build/
+pyct/_version.py
+
+# pixi
+.pixi
+pixi.lock

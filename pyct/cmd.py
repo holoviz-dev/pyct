@@ -2,7 +2,6 @@
 
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
 from . import __version__
 from .report import report
 
@@ -10,7 +9,6 @@ import os
 import importlib
 import inspect
 import argparse
-import distutils.dir_util
 import shutil
 
 def _find_examples(name):
@@ -47,7 +45,7 @@ def copy_examples(name,path,verbose=False,force=False):
         raise ValueError("Path %s already exists; please move it away, choose a different path, or use force."%path)
     if verbose:
         print("Copying examples from %s"%source)
-    distutils.dir_util.copy_tree(source, path, verbose=verbose)
+    shutil.copytree(source, path, dirs_exist_ok=True)
     print("Copied examples to %s"%path)
 
 """
@@ -71,17 +69,16 @@ clint.textui.progress
 This module provides the progressbar functionality.
 
 """
-from collections import OrderedDict
-import glob
-import sys
-import tarfile
-import time
-import zipfile
-
-import yaml
+from collections import OrderedDict  # noqa: E402
+import glob  # noqa: E402
+import sys  # noqa: E402
+import tarfile  # noqa: E402
+import time  # noqa: E402
+import zipfile  # noqa: E402
+import yaml  # noqa: E402
 
 try:
-    import requests
+    import requests  # noqa: E402
 except ImportError:
     requests = None
 

@@ -1,0 +1,84 @@
+[project]
+name = "pyct"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
+
+[tasks]
+install = 'python -m pip install --no-deps --disable-pip-version-check -e .'
+
+[activation.env]
+PYTHONIOENCODING = "utf-8"
+
+[environments]
+test-38 = ["py38", "test", "test-cmd"]
+test-39 = ["py39", "test", "test-cmd"]
+test-310 = ["py310", "test", "test-cmd"]
+test-311 = ["py311", "test", "test-cmd"]
+test-312 = ["py312", "test", "test-cmd"]
+test-313 = ["py313", "test", "test-cmd"]
+build = ["py311", "build"]
+lint = ["py311", "lint"]
+
+[dependencies]
+nomkl = "*"
+pip = "*"
+
+[feature.py38.dependencies]
+python = "3.8.*"
+
+[feature.py39.dependencies]
+python = "3.9.*"
+
+[feature.py310.dependencies]
+python = "3.10.*"
+
+[feature.py311.dependencies]
+python = "3.11.*"
+
+[feature.py312.dependencies]
+python = "3.12.*"
+
+[feature.py313.dependencies]
+python = "3.13.*"
+
+# =============================================
+# =================== TESTS ===================
+# =============================================
+[feature.test.tasks]
+test = 'pytest pyct'
+test-cmd-help = 'pyct --help'
+test-cmd-version = 'pyct --version'
+test-cmd-report-help = 'pyct report --help'
+test-cmd-report-pyct-python = 'pyct report pyct python'
+test-cmd-m-version = 'python -m pyct --version'
+test-cmd-examples = "python -c \"import pyct; pyct.report('pyct','python','system')\""
+test-build-examples = "python -c \"from pyct.build import examples\""
+
+[feature.test.dependencies]
+pytest = "*"
+
+# From the cmd extra
+[feature.test-cmd.dependencies]
+pyyaml = "*"
+requests = "*"
+
+# =============================================
+# ================== BUILD ====================
+# =============================================
+[feature.build.dependencies]
+python-build = "*"
+conda-build = "*"
+
+[feature.build.tasks]
+build-conda = 'bash scripts/conda/build.sh'
+build-pip = 'python -m build .'
+
+# =============================================
+# =================== LINT ====================
+# =============================================
+[feature.lint.dependencies]
+pre-commit = "*"
+
+[feature.lint.tasks]
+lint = 'pre-commit run --all-files'
+lint-install = 'pre-commit install'
