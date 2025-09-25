@@ -35,13 +35,13 @@ requirements:
     {% for dep in project.get('dependencies', []) %}
     - {{ dep }}
     {% endfor %}
+    {% for dep in project['optional-dependencies']['cmd'] %}
+    - {{ dep }}
+    {% endfor %}
 
 test:
   requires:
     {% for dep in project['optional-dependencies']['tests'] %}
-    - {{ dep }}
-    {% endfor %}
-    {% for dep in project['optional-dependencies']['cmd'] %}
     - {{ dep }}
     {% endfor %}
   source_files:
